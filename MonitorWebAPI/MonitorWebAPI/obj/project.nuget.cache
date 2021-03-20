@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "fpId5lnPQ7XFoWIJfr1rUA0NFLLutuzqHRX//9N8flXigO1ZHSrbOjxT0xKurOPwGzTHE2N2T5aLt6kLjyxBzg==",
+  "dgSpecHash": "wUQKX7ouD3sb7W6hOPZRvNaFT6VQBcojYkEPaAMF0Q6ZeZnf1PLzYD77uc2Zf3CSU4NwRcKozPFEIxtb188WLQ==",
   "success": true,
   "projectFilePath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
   "expectedPackageFiles": [
@@ -35,7 +35,10 @@
     "C:\\Users\\who.so\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512",
     "C:\\Users\\who.so\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512",
     "C:\\Users\\who.so\\.nuget\\packages\\system.diagnostics.diagnosticsource\\5.0.1\\system.diagnostics.diagnosticsource.5.0.1.nupkg.sha512",
-    "C:\\Users\\who.so\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.6.0\\system.runtime.compilerservices.unsafe.4.6.0.nupkg.sha512"
+    "C:\\Users\\who.so\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.6.0\\system.runtime.compilerservices.unsafe.4.6.0.nupkg.sha512",
+    "C:\\Users\\who.so\\.nuget\\packages\\microsoft.netcore.app.runtime.linux-x64\\3.1.13\\microsoft.netcore.app.runtime.linux-x64.3.1.13.nupkg.sha512",
+    "C:\\Users\\who.so\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.linux-x64\\3.1.13\\microsoft.aspnetcore.app.runtime.linux-x64.3.1.13.nupkg.sha512",
+    "C:\\Users\\who.so\\.nuget\\packages\\microsoft.netcore.app.host.linux-x64\\3.1.13\\microsoft.netcore.app.host.linux-x64.3.1.13.nupkg.sha512"
   ],
   "logs": []
 }

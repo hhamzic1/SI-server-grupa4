@@ -25,6 +25,15 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:4000"
+    },
+    "mwa": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "api/hello-world",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://167.99.244.168:4000"
     }
   }
 }
