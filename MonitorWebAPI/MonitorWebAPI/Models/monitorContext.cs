@@ -30,7 +30,7 @@ namespace MonitorWebAPI.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=167.99.244.168;Database=monitor;Username=si-baza;Password=sipassword2021");
+                optionsBuilder.UseNpgsql("Host=localhost;Database=monitor;Username=si-baza;Password=sipassword2021");
             }
         }
 
