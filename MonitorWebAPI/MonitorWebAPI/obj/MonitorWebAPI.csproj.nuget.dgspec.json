@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {}
+    "C:\\Users\\nedim\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {}
   },
   "projects": {
-    "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {
+    "C:\\Users\\nedim\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+        "projectUniqueName": "C:\\Users\\nedim\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
         "projectName": "MonitorWebAPI",
-        "projectPath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
-        "packagesPath": "C:\\Users\\who.so\\.nuget\\packages\\",
-        "outputPath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
+        "projectPath": "C:\\Users\\nedim\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+        "packagesPath": "C:\\Users\\nedim\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\nedim\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\who.so\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nedim\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -50,6 +50,24 @@
               "target": "Package",
               "version": "[5.0.4, )"
             },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[3.1.13, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[3.1.13, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.1.13, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[3.1.5, )"
+            },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[5.0.2, )"
@@ -69,20 +87,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
-              "version": "[3.1.13, 3.1.13]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.linux-x64",
-              "version": "[3.1.13, 3.1.13]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Runtime.linux-x64",
-              "version": "[3.1.13, 3.1.13]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -91,12 +95,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "ubuntu.20.04-x64": {
-          "#import": []
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }
