@@ -12,8 +12,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 namespace MonitorWebAPI.Controllers
 {
-    [ApiController]
     [EnableCors("MonitorPolicy")]
+    [ApiController]
     public class GroupController : ControllerBase
     {
 

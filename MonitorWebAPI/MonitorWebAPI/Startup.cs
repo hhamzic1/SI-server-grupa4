@@ -26,6 +26,13 @@ namespace MonitorWebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(o => o.AddPolicy("MonitorPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
             services.AddControllers();
             services.AddControllers().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -34,15 +41,6 @@ namespace MonitorWebAPI
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Monitor Server Test Service", Version = "v1", });
                 c.CustomSchemaIds(x => x.FullName);
             });
-
-            services.AddCors(o => o.AddPolicy("MonitorPolicy", builder =>
-            {
-                builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
-            }));
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,7 +51,7 @@ namespace MonitorWebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseCors("MonitorPolicy");
+
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
@@ -63,8 +61,9 @@ namespace MonitorWebAPI
 
             app.UseHttpsRedirection();
 
-
             app.UseRouting();
+
+            app.UseCors("MonitorPolicy");
 
             app.UseAuthorization();
 

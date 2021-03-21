@@ -13,9 +13,9 @@ using Newtonsoft.Json;
 
 namespace MonitorWebAPI.Controllers
 {
+    [EnableCors("MonitorPolicy")]
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("MonitorPolicy")]
     public class UserTasksController : ControllerBase
     {
         private readonly monitorContext _context;

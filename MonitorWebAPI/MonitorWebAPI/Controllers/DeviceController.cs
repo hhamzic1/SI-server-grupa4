@@ -13,8 +13,8 @@ using System.Threading.Tasks;
 
 namespace MonitorWebAPI.Controllers
 {
-    [ApiController]
     [EnableCors("MonitorPolicy")]
+    [ApiController]
     public class DeviceController : ControllerBase
     {
         private readonly monitorContext mc;

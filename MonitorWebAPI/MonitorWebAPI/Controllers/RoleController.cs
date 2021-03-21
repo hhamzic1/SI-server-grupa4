@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace MonitorWebAPI.Controllers
 {
-    [ApiController]
     [EnableCors("MonitorPolicy")]
+    [ApiController]
     public class RoleController : ControllerBase
     {
         private readonly monitorContext mc;
