@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ namespace MonitorWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MonitorPolicy")]
     public class UserTasksController : ControllerBase
     {
         private readonly monitorContext _context;

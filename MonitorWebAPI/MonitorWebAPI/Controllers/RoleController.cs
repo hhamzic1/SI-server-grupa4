@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MonitorWebAPI.Models;
 using System;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 namespace MonitorWebAPI.Controllers
 {
     [ApiController]
+    [EnableCors("MonitorPolicy")]
     public class RoleController : ControllerBase
     {
         private readonly monitorContext mc;

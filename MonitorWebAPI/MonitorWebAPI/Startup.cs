@@ -35,6 +35,13 @@ namespace MonitorWebAPI
                 c.CustomSchemaIds(x => x.FullName);
             });
 
+            services.AddCors(o => o.AddPolicy("MonitorPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
 
         }
 
@@ -46,7 +53,7 @@ namespace MonitorWebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors("MonitorPolicy");
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
