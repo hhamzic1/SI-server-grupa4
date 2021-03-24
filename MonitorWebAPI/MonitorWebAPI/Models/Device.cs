@@ -10,6 +10,7 @@ namespace MonitorWebAPI.Models
         public Device()
         {
             DeviceGroups = new HashSet<DeviceGroup>();
+            ErrorLogs = new HashSet<ErrorLog>();
             UserTasks = new HashSet<UserTask>();
         }
 
@@ -18,10 +19,12 @@ namespace MonitorWebAPI.Models
         public string Location { get; set; }
         public float LocationLongitude { get; set; }
         public float LocationLatitude { get; set; }
-        public bool? Status { get; set; }
-        public DateTime? LastTimeOnline { get; set; }
+        public bool Status { get; set; }
+        public DateTime LastTimeOnline { get; set; }
+        public string InstallationCode { get; set; }
 
         public virtual ICollection<DeviceGroup> DeviceGroups { get; set; }
+        public virtual ICollection<ErrorLog> ErrorLogs { get; set; }
         public virtual ICollection<UserTask> UserTasks { get; set; }
     }
 }
