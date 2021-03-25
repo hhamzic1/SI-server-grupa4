@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\nedim\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\nedim\\.nuget\\packages"
+    ]
+  }
+}
