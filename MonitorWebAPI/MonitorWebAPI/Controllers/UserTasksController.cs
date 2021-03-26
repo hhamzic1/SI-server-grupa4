@@ -27,7 +27,7 @@ namespace MonitorWebAPI.Controllers
 
         // GET: api/UserTasks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserTask>>> GetUserTasks([FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<IEnumerable<UserTask>>>> GetUserTasks([FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -39,7 +39,15 @@ namespace MonitorWebAPI.Controllers
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                return await _context.UserTasks.Where(t => t.UserId == vu.id).ToListAsync();
+                var tasks = await _context.UserTasks.Where(t => t.UserId == vu.id).ToListAsync();
+                foreach (UserTask task in tasks)
+                {
+                    if (task.DeviceId != null)
+                    {
+                        task.Device = await _context.Devices.FindAsync(task.DeviceId);
+                    }
+                }
+                return new ResponseModel<IEnumerable<UserTask>>() { data = tasks, newAccessToken = vu.accessToken };
             }
             else
             {
@@ -49,7 +57,7 @@ namespace MonitorWebAPI.Controllers
 
         // GET: api/UserTasks/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserTask>> GetUserTask(int id, [FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<UserTask>>> GetUserTask(int id, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -67,12 +75,16 @@ namespace MonitorWebAPI.Controllers
                 {
                     return NotFound();
                 }
-                else if(userTask.UserId != vu.id)
+                else if (userTask.UserId != vu.id)
                 {
                     return Unauthorized();
                 }
+                else if (userTask.DeviceId != null)
+                {
+                    userTask.Device = await _context.Devices.FindAsync(userTask.DeviceId);
+                }
 
-                return userTask;
+                return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
             }
             else
             {
@@ -84,7 +96,7 @@ namespace MonitorWebAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUserTask(int id, UserTask userTask, [FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<UserTask>>> PutUserTask(int id, UserTask userTask, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -96,14 +108,14 @@ namespace MonitorWebAPI.Controllers
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                userTask.UserId = vu.id;
+                userTask.TaskId = id;
 
-                if (id != userTask.TaskId)
+                var oldTask = _context.UserTasks.AsNoTracking().Where(u => u.TaskId == id).FirstOrDefault();
+
+                if (oldTask == null || oldTask.UserId != vu.id)
                 {
                     return BadRequest();
-                }
-                else if(userTask.UserId != vu.id)
-                {
-                    return Unauthorized();
                 }
 
                 _context.Entry(userTask).State = EntityState.Modified;
@@ -111,6 +123,7 @@ namespace MonitorWebAPI.Controllers
                 try
                 {
                     await _context.SaveChangesAsync();
+                    return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -124,7 +137,7 @@ namespace MonitorWebAPI.Controllers
                     }
                 }
 
-                return NoContent();
+                //return NoContent();
             }
             else
             {
@@ -136,7 +149,7 @@ namespace MonitorWebAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<UserTask>> PostUserTask(UserTask userTask, [FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<UserTask>>> PostUserTask(UserTask userTask, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -149,11 +162,19 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
+                if (userTask.DeviceId != null && _context.Devices.Find(userTask.DeviceId) == null ||
+                    userTask.DeviceId == null && userTask.Location == null ||
+                    userTask.Location != null && userTask.DeviceId != null)
+                {
+                    return BadRequest();
+                }
+
+
                 userTask.UserId = vu.id;
                 _context.UserTasks.Add(userTask);
                 await _context.SaveChangesAsync();
-
-                return CreatedAtAction("GetUserTask", new { id = userTask.TaskId }, userTask);
+                return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
+                //return CreatedAtAction("GetUserTask", new { id = userTask.TaskId }, userTask);
             }
             else
             {
@@ -163,7 +184,7 @@ namespace MonitorWebAPI.Controllers
 
         // DELETE: api/UserTasks/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<UserTask>> DeleteUserTask(int id, [FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<UserTask>>> DeleteUserTask(int id, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -181,7 +202,7 @@ namespace MonitorWebAPI.Controllers
                 {
                     return NotFound();
                 }
-                else if(userTask.UserId != vu.id)
+                else if (userTask.UserId != vu.id)
                 {
                     return Unauthorized();
                 }
@@ -189,12 +210,26 @@ namespace MonitorWebAPI.Controllers
                 _context.UserTasks.Remove(userTask);
                 await _context.SaveChangesAsync();
 
-                return userTask;
+                return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
             }
             else
             {
                 return Unauthorized();
             }
+        }
+
+        // GET: api/TasksStatus
+        [HttpGet("Status")]
+        public async Task<ActionResult<IEnumerable<Models.TaskStatus>>> GetTasksStatus()
+        {
+            return await _context.TaskStatuses.ToListAsync();
+        }
+
+        // GET: api/TasksStatus/id
+        [HttpGet("Status/{id}")]
+        public async Task<ActionResult<Models.TaskStatus>> GetTasksStatus(int id)
+        {
+            return _context.TaskStatuses.Find(id);
         }
 
         private bool UserTaskExists(int id)

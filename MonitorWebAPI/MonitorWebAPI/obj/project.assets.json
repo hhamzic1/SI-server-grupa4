@@ -9101,19 +9101,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Emin Šiljak\\.nuget\\packages\\": {}
+    "C:\\Users\\nedim\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Emin Šiljak\\source\\repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+      "projectUniqueName": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
       "projectName": "MonitorWebAPI",
-      "projectPath": "C:\\Users\\Emin Šiljak\\source\\repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
-      "packagesPath": "C:\\Users\\Emin Šiljak\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Emin Šiljak\\source\\repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
+      "projectPath": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+      "packagesPath": "C:\\Users\\nedim\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Emin Šiljak\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\nedim\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
