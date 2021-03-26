@@ -9106,11 +9106,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nedim\\Source\\Repos\\hhamzic1\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+      "projectUniqueName": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
       "projectName": "MonitorWebAPI",
-      "projectPath": "C:\\Users\\nedim\\Source\\Repos\\hhamzic1\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+      "projectPath": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
       "packagesPath": "C:\\Users\\nedim\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nedim\\Source\\Repos\\hhamzic1\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
+      "outputPath": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\nedim\\AppData\\Roaming\\NuGet\\NuGet.Config",

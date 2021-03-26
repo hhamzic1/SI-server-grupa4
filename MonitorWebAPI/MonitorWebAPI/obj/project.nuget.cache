@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "YryDhlzIFg6Nc2w5TaNaVIv6+12al0yMqHf1ZeAZka1RoWUETOP95nxFqR3+y4LAnLPmoGEcrxeR+69r6LfQ1Q==",
+  "dgSpecHash": "IdkiMr/iuwg1CbGg/zbYkeAfqLl21tnW9lPKSuXuf2qHYxWv6gvog3x1IrTWN5rejgaRlIO7o4ahHbLqH799rQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\nedim\\Source\\Repos\\hhamzic1\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+  "projectFilePath": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nedim\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\nedim\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",

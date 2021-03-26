@@ -40,7 +40,7 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 var tasks = await _context.UserTasks.Where(t => t.UserId == vu.id).ToListAsync();
-                foreach(UserTask task in tasks)
+                foreach (UserTask task in tasks)
                 {
                     if (task.DeviceId != null)
                     {
@@ -75,7 +75,7 @@ namespace MonitorWebAPI.Controllers
                 {
                     return NotFound();
                 }
-                else if(userTask.UserId != vu.id)
+                else if (userTask.UserId != vu.id)
                 {
                     return Unauthorized();
                 }
@@ -168,7 +168,7 @@ namespace MonitorWebAPI.Controllers
                 {
                     return BadRequest();
                 }
-                
+
 
                 userTask.UserId = vu.id;
                 _context.UserTasks.Add(userTask);
@@ -202,7 +202,7 @@ namespace MonitorWebAPI.Controllers
                 {
                     return NotFound();
                 }
-                else if(userTask.UserId != vu.id)
+                else if (userTask.UserId != vu.id)
                 {
                     return Unauthorized();
                 }
