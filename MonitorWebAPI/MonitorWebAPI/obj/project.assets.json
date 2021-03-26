@@ -9101,23 +9101,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Kanita\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\nedim\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Kanita\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+      "projectUniqueName": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
       "projectName": "MonitorWebAPI",
-      "projectPath": "C:\\Users\\Kanita\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
-      "packagesPath": "C:\\Users\\Kanita\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Kanita\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
+      "projectPath": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+      "packagesPath": "C:\\Users\\nedim\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\nedim\\Desktop\\SI grupa\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Kanita\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\nedim\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -9198,7 +9194,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
       }
     }
   }

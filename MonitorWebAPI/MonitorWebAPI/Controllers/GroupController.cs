@@ -47,7 +47,40 @@ namespace MonitorWebAPI.Controllers
 
         [Route("/api/group/MyAssignedGroups")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<Group>>>> MyAssignedGroups([FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<GroupHierarchyModel>>> MyAssignedGroups([FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                    var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
+                    var helperMethod = new HelperMethods();
+                    if (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, vu.groupId))
+                    {
+                        Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
+                        GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
+                        return new ResponseModel<GroupHierarchyModel>() { data = ghm, newAccessToken = vu.accessToken };
+                    }
+                    else
+                    {
+                        return Unauthorized("You dont have access to this groups tree");
+                    }
+            }
+            else
+            {
+                return Unauthorized("Token not valid");
+            }
+        }
+
+        [Route("/api/group/GroupTreeById/{groupId}")]
+        [HttpGet]
+        public async Task<ActionResult<ResponseModel<GroupHierarchyModel>>> GroupTree([FromHeader] string Authorization, int groupId)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -60,19 +93,16 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
-                if (userRoleName == "MonitorSuperAdmin")
+                var helperMethod = new HelperMethods();
+                if (userRoleName == "MonitorSuperAdmin" || (userRoleName=="SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId)))
                 {
-                    return new ResponseModel<List<Group>>() { data = mc.Groups.ToList(), newAccessToken = vu.accessToken };
-                }
-                else if (userRoleName == "SuperAdmin")
-                {
-                    List<Group> subGroups = mc.Groups.Where(x => x.ParentGroup == vu.groupId).ToList();
-                    subGroups.Add(mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault());
-                    return new ResponseModel<List<Group>>() { data = subGroups, newAccessToken = vu.accessToken };
+                    Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+                    GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
+                    return new ResponseModel<GroupHierarchyModel>() { data = ghm, newAccessToken = vu.accessToken };
                 }
                 else
                 {
-                    return Unauthorized();
+                    return Unauthorized("You dont have access to this groups tree");
                 }
             }
             else
@@ -80,6 +110,7 @@ namespace MonitorWebAPI.Controllers
                 return Unauthorized();
             }
         }
+
     }
 
 
