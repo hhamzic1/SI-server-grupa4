@@ -27,6 +27,33 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
+        public GroupHierarchyModel FindHierarchyTreeWithDevices(Group g)
+        {
+            monitorContext mc = new monitorContext();
+            GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = g.GroupId, Name = g.Name, SubGroups = new List<GroupHierarchyModel>() };
+            findSubgroupsWithDevices(ghm, mc);
+            return ghm;
+        }
+
+        void findSubgroupsWithDevices(GroupHierarchyModel ghm, monitorContext mc)
+        {
+            var tempList = mc.Groups.Where(x => x.ParentGroup == ghm.GroupId);
+            foreach (var group in tempList)
+            {
+                ghm.SubGroups.Add(new GroupHierarchyModel { GroupId = group.GroupId, Name = group.Name, SubGroups = new List<GroupHierarchyModel>() });
+            }
+            foreach (var tempGhm in ghm.SubGroups)
+            {
+                findSubgroupsWithDevices(tempGhm, mc);
+            }
+            ghm.Devices = (from dg in mc.DeviceGroups
+                           join d in mc.Devices on dg.DeviceId equals d.DeviceId
+                           where dg.GroupId == ghm.GroupId
+                           select d).ToList();
+        }
+
+
+
         // ----------- da li uređaj pripada korisnikovom stablu
         public bool CheckIfDeviceBelongsToUsersTree(VerifyUserModel vu, int deviceId)
         {

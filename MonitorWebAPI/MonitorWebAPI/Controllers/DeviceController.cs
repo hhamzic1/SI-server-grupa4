@@ -134,14 +134,14 @@ namespace MonitorWebAPI.Controllers
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                 var helperMethod = new HelperMethods();
-                if (userRoleName == "MonitorSistemAdmin" || (userRoleName == "SuperAdmin"))
+                if (userRoleName == "MonitorSistemAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu,groupId)))
                 {
                     Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
                     if(g==null)
                     {
                         return NotFound();
                     }
-                    GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
+                    GroupHierarchyModel ghm = helperMethod.FindHierarchyTreeWithDevices(g);
                     List<Device> allDevices = ghm.Devices.ToList();
                     
                     List<DeviceResponseModel> drmList = new List<DeviceResponseModel>();
