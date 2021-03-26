@@ -1,4 +1,5 @@
 ﻿using MonitorWebAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 namespace MonitorWebAPI.Helpers
@@ -60,7 +61,11 @@ namespace MonitorWebAPI.Helpers
             monitorContext mc = new monitorContext();
             string groupName = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault().Name;
             bool belongs = false;
-            int? deviceGroupId = mc.DeviceGroups.Where(x => x.DeviceId == deviceId).FirstOrDefault().GroupId;
+            DeviceGroup deviceGroup = mc.DeviceGroups.Where(x => x.DeviceId == deviceId).FirstOrDefault();
+            if(deviceGroup == null) {
+                throw new NullReferenceException("Device with deviceId doesn't exist");
+            }
+            int? deviceGroupId = deviceGroup.GroupId;
             GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = vu.groupId, Name = groupName, SubGroups = new List<GroupHierarchyModel>() };
             checkSubgroup(ref belongs, ghm, mc, deviceGroupId);
             return belongs;

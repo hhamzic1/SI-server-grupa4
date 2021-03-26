@@ -218,18 +218,26 @@ namespace MonitorWebAPI.Controllers
             var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
             HelperMethods hm = new HelperMethods();
 
-            if (userRoleName == MONITOR_SUPER_ADMIN || (userRoleName == SUPER_ADMIN && hm.CheckIfDeviceBelongsToUsersTree(vu, deviceId)))
-            {
-                //if startDate isn't passed startDateParsed is set to the old times to get all device logs for passed device
-                //if endDate isn't passed endDateParsed is set to now to get all device logs for passed device
-                DateTime startDateParsed = startDate != null ? DateTime.Parse(startDate) : DateTime.Now.AddYears(-1500);
-                DateTime endDateParsed = endDate != null ? DateTime.Parse(endDate) : DateTime.Now;
+            try {
+                if (userRoleName == MONITOR_SUPER_ADMIN || (userRoleName == SUPER_ADMIN && hm.CheckIfDeviceBelongsToUsersTree(vu, deviceId))) {
+                    //if startDate isn't passed startDateParsed is set to the old times to get all device logs for passed device
+                    //if endDate isn't passed endDateParsed is set to now to get all device logs for passed device
+                    DateTime startDateParsed = startDate != null ? DateTime.Parse(startDate) : DateTime.Now.AddYears(-1500);
+                    DateTime endDateParsed = endDate != null ? DateTime.Parse(endDate) : DateTime.Now;
 
-                List<DeviceStatusLog> dslList = mc.DeviceStatusLogs
-                    .Where(x => x.DeviceId == deviceId && x.TimeStamp >= startDateParsed && x.TimeStamp <= endDateParsed)
-                    .ToList();
-                DeviceStatusLogsWithAverageHardwareUsage returnData = new DeviceStatusLogsWithAverageHardwareUsage(dslList);
-                return new ResponseModel<DeviceStatusLogsWithAverageHardwareUsage>() { data = returnData, newAccessToken = vu.accessToken };
+                    List<DeviceStatusLog> dslList = mc.DeviceStatusLogs
+                        .Where(x => x.DeviceId == deviceId)
+                        .ToList()
+                        .Where(x => DateTime.Compare(x.TimeStamp, startDateParsed) >= 0 && DateTime.Compare(x.TimeStamp, endDateParsed) <= 0)
+                        .ToList();
+
+                    DeviceStatusLogsWithAverageHardwareUsage returnData = new DeviceStatusLogsWithAverageHardwareUsage(dslList);
+                    return new ResponseModel<DeviceStatusLogsWithAverageHardwareUsage>() { data = returnData, newAccessToken = vu.accessToken };
+                }
+            } catch (NullReferenceException e) {
+                return NotFound(e.Message);
+            } catch(FormatException) {
+                return BadRequest("startDate and/or endDate are in wrong DateTime format. Use yyyy-MM-dd HH:mm:ss");
             }
 
             return Unauthorized(NO_ACCESS);
