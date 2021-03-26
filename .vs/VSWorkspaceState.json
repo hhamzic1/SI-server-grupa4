@@ -1,0 +1,10 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\MonitorWebAPI",
+    "\\MonitorWebAPI\\MonitorWebAPI",
+    "\\MonitorWebAPI\\MonitorWebAPI\\Controllers"
+  ],
+  "SelectedNode": "\\MonitorWebAPI\\MonitorWebAPI\\Controllers\\DeviceController.cs",
+  "PreviewInSolutionExplorer": false
+}
