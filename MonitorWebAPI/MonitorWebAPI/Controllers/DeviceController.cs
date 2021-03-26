@@ -49,21 +49,19 @@ namespace MonitorWebAPI.Controllers
                 }
                 else
                 {
-                    List<Group> subgroupList = mc.Groups.Where(x => x.ParentGroup == vu.groupId).ToList();
+                    List<Device> allDevices = mc.Devices.ToList();
+                    HelperMethods hm = new HelperMethods();
+                    List<Device> myDevices = new List<Device>();
 
-                    List<DeviceGroup> dgList = mc.DeviceGroups.Where(x => x.GroupId == vu.groupId).ToList();
-                    for (int i = 0; i < subgroupList.Count; i++)
+                    foreach(Device dev in allDevices)
                     {
-                        dgList.AddRange(mc.DeviceGroups.Where(x => x.GroupId == subgroupList[i].GroupId));
+                        if(hm.CheckIfDeviceBelongsToUsersTree(vu,dev.DeviceId))
+                        {
+                            myDevices.Add(dev);
+                        }
                     }
 
-                    List<Device> allDevices = new List<Device>();
-
-                    for (int i = 0; i < dgList.Count; i++)
-                    {
-                        allDevices.AddRange(mc.Devices.Where(x => x.DeviceId == dgList[i].DeviceId));
-                    }
-                    return new ResponseModel<List<Device>>() { data = allDevices, newAccessToken = vu.accessToken };
+                    return new ResponseModel<List<Device>>() { data = myDevices, newAccessToken = vu.accessToken };
                 }
             }
             else
