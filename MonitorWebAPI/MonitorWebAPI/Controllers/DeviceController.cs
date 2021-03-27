@@ -115,7 +115,7 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return Unauthorized();
+                        return Forbid("You don't have permission to create device in this group");
                     }
                 }
                 catch (Exception e)
@@ -212,7 +212,7 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return NotFound();
+                        return Forbid("You don't have access to this groups devices");
                     }
                 }
                 catch(Exception e)
@@ -234,14 +234,14 @@ namespace MonitorWebAPI.Controllers
             String JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
             {
-                return Unauthorized(NO_ACCESS);
+                return Unauthorized();
             }
 
             HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
 
             if (!response.IsSuccessStatusCode)
             {
-                return Unauthorized(NO_ACCESS);
+                return Unauthorized();
             }
 
             String responseBody = await response.Content.ReadAsStringAsync();
@@ -265,12 +265,13 @@ namespace MonitorWebAPI.Controllers
                     DeviceStatusLogsWithAverageHardwareUsage returnData = new DeviceStatusLogsWithAverageHardwareUsage(dslList);
                     return new ResponseModel<DeviceStatusLogsWithAverageHardwareUsage>() { data = returnData, newAccessToken = vu.accessToken };
                 }
+
             } catch (NullReferenceException e) {
                 return NotFound(e.Message);
             } catch(FormatException) {
                 return BadRequest("startDate and/or endDate are in wrong DateTime format. Use yyyy-MM-dd HH:mm:ss");
             }
-            return Unauthorized(NO_ACCESS);
+            return Forbid(NO_ACCESS);
         }
     }
 }

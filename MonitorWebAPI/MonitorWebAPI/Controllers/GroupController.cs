@@ -69,7 +69,7 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return Unauthorized("You dont have access to this groups tree");
+                        return Forbid("You dont have access to this groups tree");
                     }
             }
             else
@@ -104,7 +104,7 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return Unauthorized("You dont have access to this groups tree");
+                        return Forbid("You dont have access to this groups tree");
                     }
                 }
                 catch(Exception e)
