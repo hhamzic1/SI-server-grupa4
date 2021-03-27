@@ -69,7 +69,7 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return Forbid("You dont have access to this groups tree");
+                        return StatusCode(403);
                     }
             }
             else
@@ -104,7 +104,7 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return Forbid("You dont have access to this groups tree");
+                        return StatusCode(403);
                     }
                 }
                 catch(Exception e)

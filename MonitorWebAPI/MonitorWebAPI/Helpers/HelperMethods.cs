@@ -98,12 +98,14 @@ namespace MonitorWebAPI.Helpers
         public bool CheckIfGroupBelongsToUsersTree(VerifyUserModel vu, int? groupId)
         {
             monitorContext mc = new monitorContext();
-            Group group = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
-            if(group==null)
+            string groupName = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault().Name;
+
+            Group tempGroup  = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+            if (tempGroup == null)
             {
                 throw new NullReferenceException("Group with that id doesn't exist!");
             }
-            var groupName = group.Name;
+
             bool belongs = vu.groupId==groupId;
             GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = vu.groupId, Name = groupName, SubGroups = new List<GroupHierarchyModel>() };
             ifGroupBelongsToTree(ref belongs, ghm, mc, groupId);

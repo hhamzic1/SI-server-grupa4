@@ -21,7 +21,6 @@ namespace MonitorWebAPI.Controllers
         private readonly monitorContext mc;
         private readonly string SUPER_ADMIN = "SuperAdmin";
         private readonly string MONITOR_SUPER_ADMIN = "MonitorSuperAdmin";
-        private readonly string NO_ACCESS = "You have no access to information about these devices";
         public DeviceController()
         {
             mc = new monitorContext();
@@ -115,22 +114,12 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return Forbid("You don't have permission to create device in this group");
+                        return StatusCode(403);
                     }
                 }
                 catch (Exception e)
                 {
-                    DeviceGroup dg = mc.DeviceGroups.Where(x => x.DeviceId == device.DeviceId && x.GroupId == groupId).FirstOrDefault();
-                    if (dg != null)
-                    {
-                        mc.DeviceGroups.Remove(dg);
-                    }
-                    Device tempDevice = mc.Devices.Where(x => x.Name == device.Name && x.Location == device.Location).FirstOrDefault();
-                    if (tempDevice != null)
-                    {
-                        mc.Devices.Remove(tempDevice);
-                    }
-                    return BadRequest(e.Message);
+                    return BadRequest(e.Message +"\n" +e.InnerException);
                 }
             }
             else
@@ -212,7 +201,7 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return Forbid("You don't have access to this groups devices");
+                        return StatusCode(403);
                     }
                 }
                 catch(Exception e)
@@ -271,7 +260,7 @@ namespace MonitorWebAPI.Controllers
             } catch(FormatException) {
                 return BadRequest("startDate and/or endDate are in wrong DateTime format. Use yyyy-MM-dd HH:mm:ss");
             }
-            return Forbid(NO_ACCESS);
+            return StatusCode(403);
         }
     }
 }
