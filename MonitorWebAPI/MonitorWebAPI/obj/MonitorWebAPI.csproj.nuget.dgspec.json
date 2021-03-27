@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Emin Šiljak\\source\\repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {}
+    "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Emin Šiljak\\source\\repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {
+    "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Emin Šiljak\\source\\repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+        "projectUniqueName": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
         "projectName": "MonitorWebAPI",
-        "projectPath": "C:\\Users\\Emin Šiljak\\source\\repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
-        "packagesPath": "C:\\Users\\Emin Šiljak\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Emin Šiljak\\source\\repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
+        "projectPath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+        "packagesPath": "C:\\Users\\who.so\\.nuget\\packages\\",
+        "outputPath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Emin Šiljak\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\who.so\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -95,7 +95,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

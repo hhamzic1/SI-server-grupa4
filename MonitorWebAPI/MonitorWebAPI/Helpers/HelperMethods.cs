@@ -63,7 +63,7 @@ namespace MonitorWebAPI.Helpers
             bool belongs = false;
             DeviceGroup deviceGroup = mc.DeviceGroups.Where(x => x.DeviceId == deviceId).FirstOrDefault();
             if(deviceGroup == null) {
-                throw new NullReferenceException("Device with deviceId doesn't exist");
+                throw new NullReferenceException("Device with deviceId doesn't belong to any group!");
             }
             int? deviceGroupId = deviceGroup.GroupId;
             GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = vu.groupId, Name = groupName, SubGroups = new List<GroupHierarchyModel>() };
@@ -98,7 +98,12 @@ namespace MonitorWebAPI.Helpers
         public bool CheckIfGroupBelongsToUsersTree(VerifyUserModel vu, int? groupId)
         {
             monitorContext mc = new monitorContext();
-            string groupName = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault().Name;
+            Group group = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
+            if(group==null)
+            {
+                throw new NullReferenceException("Group with that id doesn't exist!");
+            }
+            var groupName = group.Name;
             bool belongs = vu.groupId==groupId;
             GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = vu.groupId, Name = groupName, SubGroups = new List<GroupHierarchyModel>() };
             ifGroupBelongsToTree(ref belongs, ghm, mc, groupId);

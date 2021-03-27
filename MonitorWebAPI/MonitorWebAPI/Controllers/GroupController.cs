@@ -94,15 +94,22 @@ namespace MonitorWebAPI.Controllers
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                 var helperMethod = new HelperMethods();
-                if (userRoleName == "MonitorSuperAdmin" || (userRoleName=="SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId)))
+                try
                 {
-                    Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
-                    GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
-                    return new ResponseModel<GroupHierarchyModel>() { data = ghm, newAccessToken = vu.accessToken };
+                    if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId)))
+                    {
+                        Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+                        GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
+                        return new ResponseModel<GroupHierarchyModel>() { data = ghm, newAccessToken = vu.accessToken };
+                    }
+                    else
+                    {
+                        return Unauthorized("You dont have access to this groups tree");
+                    }
                 }
-                else
+                catch(Exception e)
                 {
-                    return Unauthorized("You dont have access to this groups tree");
+                    return BadRequest(e.Message);
                 }
             }
             else
