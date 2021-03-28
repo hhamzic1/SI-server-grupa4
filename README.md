@@ -45,7 +45,7 @@ Potrebno je skinuti projekat sa github repozitorija i otvoriti ga pomoću Visual
 
   * Daje sve uređaje koji su dostupni tom korisniku u zavisnosti od njegove role i grupe
 
-* [Route("api/device/GetAllDeviceLogs")]
+* [Route("api/device/GetDeviceLogs")] 
 
   [HttpGet]
   
@@ -62,6 +62,24 @@ Potrebno je skinuti projekat sa github repozitorija i otvoriti ga pomoću Visual
   [HttpGet]
 
   * Ako je logovani korisnik MonitorSuperAdmin - vraća sve grupe koje postoje u bazi, u suprotnom vraća grupe kojim je logovani korisnik dodijeljen
+
+* [Route("/api/group/GroupTreeById/{groupId}")]
+
+  [HttpGet]
+  
+  * Za određenu grupu vraća se hijerarhija podgrupa
+
+* [Route("/api/report/AllReportsForUser")]
+
+  [HttpGet]
+  
+  * Daje sve izvještaje za logovanog korisnika
+
+* [Route("/api/role/GetRoles")]
+
+  [HttpGet]
+  
+  * Daje sve role 
 
 Za dodatne informacije o rutama posjetite: https://si-2021.167.99.244.168.nip.io/swagger/index.html
 
