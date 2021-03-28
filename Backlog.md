@@ -8,7 +8,7 @@ App must provide possibility to create new devices. Then, with their credentials
 - Create a new branch and switch to it
 - Scaffold model from the database
 - Create routes for viewing all devices
-- Create routes for creating device
+- Create route for creating device
 - Create routes for user information
 - Create route for viewing device logs 
 - Commit and push on your branch
@@ -17,11 +17,12 @@ App must provide possibility to create new devices. Then, with their credentials
 ## Feature 
 Search and pagination for devices
 ### Item
-App must provide possibility for searching the devices 
+App must provide possibility for searching and pagination of devices  
 #### Task
 - Create a new branch and switch to it
 - Re-scaffold model from the database
-- Create routes for device search
+- Create route for device search and pagination
+- Create route for group hierarchy
 - Commit and push on your branch
 - Create a pull request
 - Merge branches
