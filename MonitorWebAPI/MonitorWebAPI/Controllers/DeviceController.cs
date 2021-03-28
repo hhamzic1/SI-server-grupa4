@@ -130,7 +130,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/device/AllDevicesForGroup")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<DeviceResponseModel>>>> AllDevicesForGroup([FromQuery] int? page, [FromQuery] int? per_page, [FromQuery] string? name, [FromQuery] string? status, [FromQuery] int groupId, string? sort_by, [FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<DevicePagingModel>>> AllDevicesForGroup([FromQuery] int? page, [FromQuery] int? per_page, [FromQuery] string? name, [FromQuery] string? status, [FromQuery] int groupId, string? sort_by, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -171,6 +171,7 @@ namespace MonitorWebAPI.Controllers
                                 GroupId = (from x in mc.DeviceGroups.OfType<DeviceGroup>() where x.DeviceId == dev.DeviceId select x.GroupId).FirstOrDefault()
                             });
                         }
+
                         int parsedPage = (page == null || page <= 0) ? 1 : (int)page;
                         int parsedPerPage = (per_page == null || per_page <= 0) ? 10 : (int)per_page;
                         string parsedName = name == null ? "" : name;
@@ -207,7 +208,7 @@ namespace MonitorWebAPI.Controllers
                                 break;
                         }
 
-                        return new ResponseModel<List<DeviceResponseModel>>() { data = filteredList, newAccessToken = vu.accessToken };
+                        return new ResponseModel<DevicePagingModel>() { data = new DevicePagingModel() { Devices=filteredList, DeviceCount=allDevices.Count}, newAccessToken = vu.accessToken };
                     }
                     else
                     {
