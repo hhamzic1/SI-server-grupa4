@@ -13,7 +13,7 @@ namespace MonitorWebAPI.Helpers
         {
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWT);
-            return await client.GetAsync("https://si-2021.167.99.244.168.nip.io:3333/login");
+            return await client.GetAsync("https://si-2021.167.99.244.168.nip.io:3333/jwt/verify");
         }
 
         public static string GetToken(string Authorization)
