@@ -130,10 +130,10 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/device/AllDevicesForGroup")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<DeviceResponseModel>>>> AllDevicesForGroup([FromQuery] int page,[FromQuery] int per_page, [FromQuery] string? name,[FromQuery] string status ,[FromQuery] int groupId,string sort_by,[FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<List<DeviceResponseModel>>>> AllDevicesForGroup([FromQuery] int? page, [FromQuery] int? per_page, [FromQuery] string? name, [FromQuery] string? status, [FromQuery] int groupId, string? sort_by, [FromHeader] string Authorization)
         {
-           string JWT = JWTVerify.GetToken(Authorization);
-            if(JWT==null)
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
             {
                 return Unauthorized();
             }
@@ -159,20 +159,30 @@ namespace MonitorWebAPI.Controllers
                         List<DeviceResponseModel> drmList = new List<DeviceResponseModel>();
                         foreach (var dev in allDevices)
                         {
-                            drmList.Add(new DeviceResponseModel() { DeviceId = dev.DeviceId, Name = dev.Name, Location = dev.Location, LocationLatitude = dev.LocationLatitude, LocationLongitude = dev.LocationLongitude, Status = dev.Status, LastTimeOnline = dev.LastTimeOnline, GroupId = (from x in dev.DeviceGroups.OfType<DeviceGroup>() where x.DeviceId == dev.DeviceId select x.GroupId).FirstOrDefault() });
+                            drmList.Add(new DeviceResponseModel()
+                            {
+                                DeviceId = dev.DeviceId,
+                                Name = dev.Name,
+                                Location = dev.Location,
+                                LocationLatitude = dev.LocationLatitude,
+                                LocationLongitude = dev.LocationLongitude,
+                                Status = dev.Status,
+                                LastTimeOnline = dev.LastTimeOnline,
+                                GroupId = (from x in mc.DeviceGroups.OfType<DeviceGroup>() where x.DeviceId == dev.DeviceId select x.GroupId).FirstOrDefault()
+                            });
                         }
-                        if (drmList.Count == 0)
-                        {
-                            return NotFound();
-                        }
-                        int skip = (page - 1) * per_page;
-                        var filteredList = drmList.Skip(skip).Take(per_page).ToList();
+                        int parsedPage = (page == null || page <= 0) ? 1 : (int)page;
+                        int parsedPerPage = (per_page == null || per_page <= 0) ? 10 : (int)per_page;
+                        string parsedName = name == null ? "" : name;
+                        string parsedSortBy = sort_by == null ? "" : sort_by;
+                        int skip = (parsedPage - 1) * parsedPerPage;
+                        var filteredList = drmList.Skip(skip).Take(parsedPerPage).ToList();
                         bool onlineStatus = true;
                         if (status == "active") onlineStatus = true;
                         else if (status == "notactive") onlineStatus = false;
-                        if (name == null) name = "";
-                        filteredList = filteredList.FindAll(x => x.Name.Contains(name)).FindAll(s => s.Status == onlineStatus).ToList();
-                        switch (sort_by)
+
+                        filteredList = filteredList.FindAll(x => x.Name.Contains(parsedName)).FindAll(s => s.Status == onlineStatus).ToList();
+                        switch (parsedSortBy)
                         {
                             case "name_asc":
                                 filteredList = filteredList.OrderBy(x => x.Name).ToList();
@@ -204,18 +214,18 @@ namespace MonitorWebAPI.Controllers
                         return StatusCode(403);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     return BadRequest(e.Message);
                 }
-              
+
             }
             else
             {
                 return Unauthorized();
             }
         }
-        
+
         [Route("api/device/GetDeviceLogs")]
         [HttpGet]
         public async Task<ActionResult<ResponseModel<DeviceStatusLogsWithAverageHardwareUsage>>> GetDeviceLogs([FromHeader] String Authorization, [FromQuery] int deviceId, [FromQuery] String? startDate, [FromQuery] String? endDate)
