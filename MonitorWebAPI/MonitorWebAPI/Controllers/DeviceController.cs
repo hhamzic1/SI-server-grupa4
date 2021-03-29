@@ -168,6 +168,7 @@ namespace MonitorWebAPI.Controllers
                                 LocationLongitude = dev.LocationLongitude,
                                 Status = dev.Status,
                                 LastTimeOnline = dev.LastTimeOnline,
+                                InstallationCode = dev.InstallationCode,
                                 GroupId = (from x in mc.DeviceGroups.OfType<DeviceGroup>() where x.DeviceId == dev.DeviceId select x.GroupId).FirstOrDefault()
                             });
                         }

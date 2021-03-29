@@ -12,6 +12,7 @@ namespace MonitorWebAPI.Models
         public bool? Status { get; set; }
         public DateTime? LastTimeOnline { get; set; }
         public int? GroupId { get; set; }
+        public string InstallationCode { get; set; }
 
     }
 }
