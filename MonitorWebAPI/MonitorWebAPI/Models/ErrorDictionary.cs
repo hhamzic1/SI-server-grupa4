@@ -13,9 +13,9 @@ namespace MonitorWebAPI.Models
         }
 
         public int Id { get; set; }
-        public int Code { get; set; }
+        public int? Code { get; set; }
         public string Description { get; set; }
-        public string Color { get; set; }
+        public string Type { get; set; }
 
         public virtual ICollection<ErrorLog> ErrorLogs { get; set; }
     }

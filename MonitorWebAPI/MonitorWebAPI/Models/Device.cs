@@ -22,6 +22,7 @@ namespace MonitorWebAPI.Models
         public bool Status { get; set; }
         public DateTime LastTimeOnline { get; set; }
         public string InstallationCode { get; set; }
+        public Guid DeviceUid { get; set; }
 
         public virtual ICollection<DeviceGroup> DeviceGroups { get; set; }
         public virtual ICollection<ErrorLog> ErrorLogs { get; set; }

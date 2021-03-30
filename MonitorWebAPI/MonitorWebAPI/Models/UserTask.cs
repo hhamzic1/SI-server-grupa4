@@ -7,6 +7,11 @@ namespace MonitorWebAPI.Models
 {
     public partial class UserTask
     {
+        public UserTask()
+        {
+            UserTrackers = new HashSet<UserTracker>();
+        }
+
         public int TaskId { get; set; }
         public int UserId { get; set; }
         public int? DeviceId { get; set; }
@@ -19,5 +24,6 @@ namespace MonitorWebAPI.Models
         public virtual Device Device { get; set; }
         public virtual TaskStatus Status { get; set; }
         public virtual User User { get; set; }
+        public virtual ICollection<UserTracker> UserTrackers { get; set; }
     }
 }
