@@ -18,9 +18,11 @@ namespace MonitorWebAPI.Controllers
     {
 
         private readonly monitorContext mc;
+        private HelperMethods helperMethod;
         public GroupController()
         {
             mc = new monitorContext();
+            helperMethod = new HelperMethods();
         }
 
         [Route("api/group/MyGroup")]
@@ -60,7 +62,6 @@ namespace MonitorWebAPI.Controllers
                     string responseBody = await response.Content.ReadAsStringAsync();
                     VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                     var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
-                    var helperMethod = new HelperMethods();
                     if (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, vu.groupId))
                     {
                         Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
@@ -93,7 +94,6 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
-                var helperMethod = new HelperMethods();
                 try
                 {
                     if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId)))
@@ -110,6 +110,52 @@ namespace MonitorWebAPI.Controllers
                 catch(Exception e)
                 {
                     return BadRequest(e.Message);
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [Route("/api/group/CreateGroup")]
+        [HttpPost]
+        public async Task<ActionResult<ResponseModel<Group>>> CreateGroup([FromHeader] string Authorization, [FromBody] Group group)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
+                try
+                {
+                    if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, group.ParentGroup)))
+                    {
+                        mc.Groups.Add(group);
+                        await mc.SaveChangesAsync();
+                        int id = group.GroupId;
+
+                        Group tempGroup = mc.Groups.Where(x => x.GroupId == id).FirstOrDefault();
+                        if (tempGroup != null)
+                        {
+                            return new ResponseModel<Group>() { data = tempGroup, newAccessToken = vu.accessToken };
+                        }
+                        throw new Exception("Group wasn't added succesfully");
+                    }
+                    else
+                    {
+                        return StatusCode(403);
+                    }
+                }
+                catch (Exception e)
+                {
+                    return StatusCode(403);
                 }
             }
             else
