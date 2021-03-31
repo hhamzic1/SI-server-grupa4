@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
+using MonitorWebAPI.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MonitorWebAPI.Helpers;
@@ -18,11 +19,12 @@ namespace MonitorWebAPI.Controllers
     [ApiController]
     public class UserTasksController : ControllerBase
     {
-        private readonly monitorContext _context;
+        private readonly monitorContext mc;
+        private HelperMethods helperMethods = new HelperMethods();
 
         public UserTasksController()
         {
-            _context = new monitorContext();
+            mc = new monitorContext();
         }
 
         // GET: api/UserTasks
@@ -39,12 +41,12 @@ namespace MonitorWebAPI.Controllers
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                var tasks = await _context.UserTasks.Where(t => t.UserId == vu.id).ToListAsync();
+                var tasks = await mc.UserTasks.Where(t => t.UserId == vu.id).ToListAsync();
                 foreach (UserTask task in tasks)
                 {
                     if (task.DeviceId != null)
                     {
-                        task.Device = await _context.Devices.FindAsync(task.DeviceId);
+                        task.Device = await mc.Devices.FindAsync(task.DeviceId);
                     }
                 }
                 return new ResponseModel<IEnumerable<UserTask>>() { data = tasks, newAccessToken = vu.accessToken };
@@ -69,7 +71,7 @@ namespace MonitorWebAPI.Controllers
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                var userTask = await _context.UserTasks.FindAsync(id);
+                var userTask = await mc.UserTasks.FindAsync(id);
 
                 if (userTask == null)
                 {
@@ -81,7 +83,7 @@ namespace MonitorWebAPI.Controllers
                 }
                 else if (userTask.DeviceId != null)
                 {
-                    userTask.Device = await _context.Devices.FindAsync(userTask.DeviceId);
+                    userTask.Device = await mc.Devices.FindAsync(userTask.DeviceId);
                 }
 
                 return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
@@ -111,18 +113,18 @@ namespace MonitorWebAPI.Controllers
                 userTask.UserId = vu.id;
                 userTask.TaskId = id;
 
-                var oldTask = _context.UserTasks.AsNoTracking().Where(u => u.TaskId == id).FirstOrDefault();
+                var oldTask = mc.UserTasks.AsNoTracking().Where(u => u.TaskId == id).FirstOrDefault();
 
                 if (oldTask == null || oldTask.UserId != vu.id)
                 {
                     return BadRequest();
                 }
 
-                _context.Entry(userTask).State = EntityState.Modified;
+                mc.Entry(userTask).State = EntityState.Modified;
 
                 try
                 {
-                    await _context.SaveChangesAsync();
+                    await mc.SaveChangesAsync();
                     return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
                 }
                 catch (DbUpdateConcurrencyException)
@@ -162,7 +164,7 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                if (userTask.DeviceId != null && _context.Devices.Find(userTask.DeviceId) == null ||
+                if (userTask.DeviceId != null && mc.Devices.Find(userTask.DeviceId) == null ||
                     userTask.DeviceId == null && userTask.Location == null ||
                     userTask.Location != null && userTask.DeviceId != null)
                 {
@@ -171,8 +173,8 @@ namespace MonitorWebAPI.Controllers
 
 
                 userTask.UserId = vu.id;
-                _context.UserTasks.Add(userTask);
-                await _context.SaveChangesAsync();
+                mc.UserTasks.Add(userTask);
+                await mc.SaveChangesAsync();
                 return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
                 //return CreatedAtAction("GetUserTask", new { id = userTask.TaskId }, userTask);
             }
@@ -197,7 +199,7 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                var userTask = await _context.UserTasks.FindAsync(id);
+                var userTask = await mc.UserTasks.FindAsync(id);
                 if (userTask == null)
                 {
                     return NotFound();
@@ -207,8 +209,8 @@ namespace MonitorWebAPI.Controllers
                     return Unauthorized();
                 }
 
-                _context.UserTasks.Remove(userTask);
-                await _context.SaveChangesAsync();
+                mc.UserTasks.Remove(userTask);
+                await mc.SaveChangesAsync();
 
                 return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
             }
@@ -222,19 +224,120 @@ namespace MonitorWebAPI.Controllers
         [HttpGet("Status")]
         public async Task<ActionResult<IEnumerable<Models.TaskStatus>>> GetTasksStatus()
         {
-            return await _context.TaskStatuses.ToListAsync();
+            return await mc.TaskStatuses.ToListAsync();
         }
 
         // GET: api/TasksStatus/id
         [HttpGet("Status/{id}")]
         public async Task<ActionResult<Models.TaskStatus>> GetTasksStatus(int id)
         {
-            return _context.TaskStatuses.Find(id);
+            return mc.TaskStatuses.Find(id);
+        }
+
+        // GET: api/UserTasks/Device/{id}
+        [HttpGet("Device/{id}")]
+        public async Task<ActionResult<ResponseModel<IEnumerable<UserTask>>>> GetUserTasksForDevice(int id, [FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+
+                try
+                {
+                    if (helperMethods.CheckIfDeviceBelongsToUsersTree(vu, id))
+                    {
+                        return new ResponseModel<IEnumerable<UserTask>>() { data = mc.UserTasks.Where(u => u.DeviceId == id), newAccessToken = vu.accessToken };
+                    }
+                    else
+                    {
+                        return Unauthorized();
+                    }
+                }
+                catch(NullReferenceException e)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        // GET: api/UserTasks/Tracker/id
+        [HttpGet("Tracker/{id}")]
+        public async Task<ActionResult<ResponseModel<IEnumerable<UserTracker>>>> GetUserTasksTracker(int id, [FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+
+                UserTask task = mc.UserTasks.Find(id);
+                if(vu.id == task.UserId && task != null)
+                {
+                    return new ResponseModel<IEnumerable<UserTracker>>() { data = mc.UserTrackers.Where(u => u.UserTaskId == id), newAccessToken = vu.accessToken };
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        // POST: api/UserTasks/Tracker
+        [HttpPost("Tracker")]
+        public async Task<ActionResult<ResponseModel<UserTracker>>> PostUserTracker(UserTracker userTracker, [FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+
+                UserTask userTask = mc.UserTasks.Find(userTracker.UserTaskId);
+
+                if(userTask == null || userTask.UserId != vu.id)
+                {
+                    return NotFound();
+                }
+
+                mc.UserTrackers.Add(userTracker);
+                await mc.SaveChangesAsync();
+                return new ResponseModel<UserTracker>() { data = userTracker, newAccessToken = vu.accessToken };
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         private bool UserTaskExists(int id)
         {
-            return _context.UserTasks.Any(e => e.TaskId == id);
+            return mc.UserTasks.Any(e => e.TaskId == id);
         }
     }
 }
