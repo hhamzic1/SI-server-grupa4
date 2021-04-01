@@ -13,6 +13,7 @@ namespace MonitorWebAPI.Models
         public DateTime? LastTimeOnline { get; set; }
         public int? GroupId { get; set; }
         public string InstallationCode { get; set; }
+        public Guid DeviceUid { get; set; }
 
     }
 }
