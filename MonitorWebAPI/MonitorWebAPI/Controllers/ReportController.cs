@@ -50,7 +50,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        StartDate = report.StartDate,
+                        //StartDate = report.StartDate,
                         UserId = vu.id
                     });
                 }

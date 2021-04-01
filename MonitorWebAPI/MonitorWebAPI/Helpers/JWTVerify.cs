@@ -18,12 +18,19 @@ namespace MonitorWebAPI.Helpers
 
         public static string GetToken(string Authorization)
         {
-            var temp = Authorization.Split(' ');
-            if(temp.Length==2)
+            try
             {
-                return temp[1];
+                var temp = Authorization.Split(' ');
+                if (temp.Length == 2)
+                {
+                    return temp[1];
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch(Exception e)
             {
                 return null;
             }
