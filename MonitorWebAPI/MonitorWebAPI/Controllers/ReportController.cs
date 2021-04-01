@@ -131,57 +131,57 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
-        [Route("api/report/CreateReport")]
-        [HttpPost]
-        public async Task<ActionResult<ResponseModel<ReportResponseModel>>> CreateReport([FromHeader] string Authorization, [FromBody] Report report)
-        {
-            string JWT = JWTVerify.GetToken(Authorization);
-            if (JWT == null)
-            {
-                return Unauthorized();
-            }
-            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                string responseBody = await response.Content.ReadAsStringAsync();
-                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                try
-                {
-                    report.User = mc.Users.Where(x => x.UserId == vu.id).FirstOrDefault();
-                    mc.Reports.Add(report);
-                        await mc.SaveChangesAsync();
-                        ReportResponseModel tempReport = new ReportResponseModel()
-                        {
-                            ReportId = report.ReportId,
-                            Name = report.Name,
-                            Query = report.Query,
-                            Frequency = report.Frequency,
-                            StartDate = report.NextDate,
-                            UserId = vu.id
-                        };
+        //[Route("api/report/CreateReport")]
+        //[HttpPost]
+        //public async Task<ActionResult<ResponseModel<ReportResponseModel>>> CreateReport([FromHeader] string Authorization, [FromBody] Report report)
+        //{
+        //    string JWT = JWTVerify.GetToken(Authorization);
+        //    if (JWT == null)
+        //    {
+        //        return Unauthorized();
+        //    }
+        //    HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        string responseBody = await response.Content.ReadAsStringAsync();
+        //        VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+        //        try
+        //        {
+        //            report.User = mc.Users.Where(x => x.UserId == vu.id).FirstOrDefault();
+        //            mc.Reports.Add(report);
+        //                await mc.SaveChangesAsync();
+        //                ReportResponseModel tempReport = new ReportResponseModel()
+        //                {
+        //                    ReportId = report.ReportId,
+        //                    Name = report.Name,
+        //                    Query = report.Query,
+        //                    Frequency = report.Frequency,
+        //                    StartDate = report.NextDate,
+        //                    UserId = vu.id
+        //                };
 
-                        if (tempReport != null)
-                        {
-                            await mc.SaveChangesAsync();
-                            return new ResponseModel<ReportResponseModel>() { data = tempReport, newAccessToken = vu.accessToken };
-                        }
-                        throw new Exception("Report wasn't added succesfully");
+        //                if (tempReport != null)
+        //                {
+        //                    await mc.SaveChangesAsync();
+        //                    return new ResponseModel<ReportResponseModel>() { data = tempReport, newAccessToken = vu.accessToken };
+        //                }
+        //                throw new Exception("Report wasn't added succesfully");
 
-                }
-                catch (Exception e)
-                {
-                    return BadRequest(e.Message + "\n" + e.InnerException);
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            return BadRequest(e.Message + "\n" + e.InnerException);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+        //}
 
-        [Route("api/report/StopReport")]
+        [Route("api/report/StopReport/{reportId}")]
         [HttpPut]
-        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> StopReport([FromHeader] string Authorization, [FromBody] Report reportToStop)
+        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> StopReport([FromHeader] string Authorization, int reportId)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -196,7 +196,7 @@ namespace MonitorWebAPI.Controllers
 
                 List<Report> allReports = mc.Reports.Where(x => x.Deleted == false).ToList();
 
-                var existingReport = allReports.Where(x => x.ReportId == reportToStop.ReportId).FirstOrDefault();
+                var existingReport = allReports.Where(x => x.ReportId == reportId).FirstOrDefault();
 
                 if (existingReport != null)
                 {
