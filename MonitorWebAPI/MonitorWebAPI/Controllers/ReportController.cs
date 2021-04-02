@@ -50,7 +50,11 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
+<<<<<<< HEAD
                         //StartDate = report.NextDate,
+=======
+                        StartDate = report.NextDate,
+>>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
                         UserId = vu.id
                     });
                 }
@@ -117,7 +121,11 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
+<<<<<<< HEAD
                         //StartDate = report.NextDate,
+=======
+                        StartDate = report.NextDate,
+>>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
                         UserId = vu.id
                     });
                 }
@@ -156,7 +164,11 @@ namespace MonitorWebAPI.Controllers
         //                    Name = report.Name,
         //                    Query = report.Query,
         //                    Frequency = report.Frequency,
+<<<<<<< HEAD
         //                    //StartDate = report.NextDate,
+=======
+        //                    StartDate = report.NextDate,
+>>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
         //                    UserId = vu.id
         //                };
 
@@ -213,7 +225,11 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
+<<<<<<< HEAD
                         //StartDate = report.NextDate,
+=======
+                        StartDate = report.NextDate,
+>>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
                         UserId = vu.id,
                     });
                 }
@@ -254,7 +270,11 @@ namespace MonitorWebAPI.Controllers
         //                Name = report.Name,
         //                Query = report.Query,
         //                Frequency = report.Frequency,
+<<<<<<< HEAD
         //                //StartDate = report.NextDate,
+=======
+        //                StartDate = report.NextDate,
+>>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
         //                UserId = vu.id
         //            });
         //        }
