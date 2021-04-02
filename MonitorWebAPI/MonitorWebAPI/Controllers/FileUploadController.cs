@@ -64,9 +64,9 @@ namespace MonitorWebAPI.Controllers
                     }
                     return Ok("All the files are successfully uploaded.");
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    return StatusCode(500, "Internal server error");
+                    return StatusCode(500, e.Message);
                 }
             }
             else
