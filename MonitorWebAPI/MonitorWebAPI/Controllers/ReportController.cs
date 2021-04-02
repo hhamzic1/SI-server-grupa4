@@ -50,7 +50,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        StartDate = report.NextDate,
+                        //StartDate = report.NextDate,
                         UserId = vu.id
                     });
                 }
@@ -117,7 +117,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        StartDate = report.NextDate,
+                        //StartDate = report.NextDate,
                         UserId = vu.id
                     });
                 }
@@ -156,7 +156,7 @@ namespace MonitorWebAPI.Controllers
         //                    Name = report.Name,
         //                    Query = report.Query,
         //                    Frequency = report.Frequency,
-        //                    StartDate = report.NextDate,
+        //                    //StartDate = report.NextDate,
         //                    UserId = vu.id
         //                };
 
@@ -213,7 +213,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        StartDate = report.NextDate,
+                        //StartDate = report.NextDate,
                         UserId = vu.id,
                     });
                 }
@@ -254,7 +254,7 @@ namespace MonitorWebAPI.Controllers
         //                Name = report.Name,
         //                Query = report.Query,
         //                Frequency = report.Frequency,
-        //                StartDate = report.NextDate,
+        //                //StartDate = report.NextDate,
         //                UserId = vu.id
         //            });
         //        }
