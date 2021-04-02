@@ -136,5 +136,34 @@ namespace MonitorWebAPI.Helpers
         }
         //-------------
 
+
+        private void GetDeviceList(GroupHierarchyModel? ghm, ref List<Device> deviceList)
+        {
+            if (ghm == null)
+                return;
+
+            if (ghm.SubGroups != null && ghm.SubGroups.Count != 0)
+            {
+                foreach (var entry in ghm.SubGroups)
+                {
+                    GetDeviceList(entry, ref deviceList);
+                }
+            }
+            else
+            {
+                if (ghm.Devices != null)
+                    deviceList.AddRange(ghm.Devices);
+            }
+        }
+
+        public List<Device> GetDevicesForGHM(GroupHierarchyModel ghm)
+        {
+            List<Device> deviceList = new List<Device>();
+            GetDeviceList(ghm, ref deviceList);
+
+            return deviceList;
+        }
+
+
     }
 }
