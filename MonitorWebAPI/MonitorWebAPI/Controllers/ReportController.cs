@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MonitorWebAPI.Helpers;
 using MonitorWebAPI.Models;
@@ -7,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MonitorWebAPI.Controllers
@@ -38,7 +38,7 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                List<Report> allReports = mc.Reports.Where((x => x.UserId == vu.id)).Where(y => y.Deleted == false).ToList();
+                List<Report> allReports = mc.Reports.Where(x => x.UserId == vu.id).ToList();
 
                 List<ReportResponseModel> reportList = new List<ReportResponseModel>();
 
@@ -50,11 +50,8 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-<<<<<<< HEAD
-                        //StartDate = report.NextDate,
-=======
-                        StartDate = report.NextDate,
->>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
+                        ReportInstances = report.ReportInstances,
+                        //StartDate = report.StartDate,
                         UserId = vu.id
                     });
                 }
@@ -84,29 +81,27 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                List<Report> allReports = mc.Reports.ToList().Where(x => x.Deleted == false).ToList();
+                List<Report> allReports = mc.Reports.ToList()
+                    //.Where(x => x.Deleted == false)
+                    .ToList();
 
-                if (queryReport.Frequency != null)
+                if (!string.IsNullOrEmpty(queryReport.Frequency))
                 {
-                    allReports = allReports.Where(x => x.Frequency == queryReport.Frequency).ToList();
+                    allReports = allReports.Where(x => x.Frequency.Contains(queryReport.Frequency)).ToList();
                 }
-                if (string.IsNullOrEmpty(queryReport.ReportId.ToString()))
+                if (!string.IsNullOrEmpty(queryReport.ReportId.ToString()) && queryReport.ReportId!=0)
                 {
                     allReports = allReports.Where(x => x.ReportId == queryReport.ReportId).ToList();
                 }
-                if (queryReport.Name != null)
+                if (!string.IsNullOrEmpty(queryReport.Name))
                 {
-                    allReports = allReports.Where(x => x.Name == queryReport.Name).ToList();
+                    allReports = allReports.Where(x => x.Name.Contains(queryReport.Name)).ToList();
                 }
-                if (!string.IsNullOrEmpty(queryReport.UserId.ToString()))
+                if (!string.IsNullOrEmpty(queryReport.Query))
                 {
-                    allReports = allReports.Where(x => x.UserId == queryReport.UserId).ToList();
+                    allReports = allReports.Where(x => x.Query.Contains(queryReport.Query)).ToList();
                 }
-                if (queryReport.StartDate != DateTime.MinValue)
-                {
-                    allReports = allReports.Where(x => x.NextDate.Ticks > queryReport.StartDate.Ticks).ToList();
-                }
-                if (!string.IsNullOrEmpty(queryReport.UserId.ToString()))
+                if (!string.IsNullOrEmpty(queryReport.UserId.ToString()) && queryReport.UserId != 0)
                 {
                     allReports = allReports.Where(x => x.UserId == queryReport.UserId).ToList();
                 }
@@ -121,11 +116,8 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-<<<<<<< HEAD
+                        ReportInstances = report.ReportInstances,
                         //StartDate = report.NextDate,
-=======
-                        StartDate = report.NextDate,
->>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
                         UserId = vu.id
                     });
                 }
@@ -139,57 +131,54 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
-        //[Route("api/report/CreateReport")]
-        //[HttpPost]
-        //public async Task<ActionResult<ResponseModel<ReportResponseModel>>> CreateReport([FromHeader] string Authorization, [FromBody] Report report)
-        //{
-        //    string JWT = JWTVerify.GetToken(Authorization);
-        //    if (JWT == null)
-        //    {
-        //        return Unauthorized();
-        //    }
-        //    HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        string responseBody = await response.Content.ReadAsStringAsync();
-        //        VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-        //        try
-        //        {
-        //            report.User = mc.Users.Where(x => x.UserId == vu.id).FirstOrDefault();
-        //            mc.Reports.Add(report);
-        //                await mc.SaveChangesAsync();
-        //                ReportResponseModel tempReport = new ReportResponseModel()
-        //                {
-        //                    ReportId = report.ReportId,
-        //                    Name = report.Name,
-        //                    Query = report.Query,
-        //                    Frequency = report.Frequency,
-<<<<<<< HEAD
-        //                    //StartDate = report.NextDate,
-=======
-        //                    StartDate = report.NextDate,
->>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
-        //                    UserId = vu.id
-        //                };
+        [Route("api/report/CreateReport")]
+        [HttpPost]
+        public async Task<ActionResult<ResponseModel<ReportResponseModel>>> CreateReport([FromHeader] string Authorization, [FromBody] Report report)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                try
+                {
+                    report.User = mc.Users.Where(x => x.UserId == vu.id).FirstOrDefault();
+                    mc.Reports.Add(report);
+                    await mc.SaveChangesAsync();
+                    ReportResponseModel tempReport = new ReportResponseModel()
+                    {
+                        ReportId = report.ReportId,
+                        Name = report.Name,
+                        Query = report.Query,
+                        Frequency = report.Frequency,
+                        ReportInstances = report.ReportInstances,
+                        //StartDate = report.NextDate,
+                        UserId = vu.id
+                    };
 
-        //                if (tempReport != null)
-        //                {
-        //                    await mc.SaveChangesAsync();
-        //                    return new ResponseModel<ReportResponseModel>() { data = tempReport, newAccessToken = vu.accessToken };
-        //                }
-        //                throw new Exception("Report wasn't added succesfully");
+                    if (tempReport != null)
+                    {
+                        await mc.SaveChangesAsync();
+                        return new ResponseModel<ReportResponseModel>() { data = tempReport, newAccessToken = vu.accessToken };
+                    }
+                    throw new Exception("Report wasn't added succesfully");
 
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            return BadRequest(e.Message + "\n" + e.InnerException);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return Unauthorized();
-        //    }
-        //}
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(e.Message + "\n" + e.InnerException);
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
 
         [Route("api/report/StopReport/{reportId}")]
         [HttpPut]
@@ -206,7 +195,9 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                List<Report> allReports = mc.Reports.Where(x => x.Deleted == false).ToList();
+                List<Report> allReports = mc.Reports
+                    //.Where(x => x.Deleted == false)
+                    .ToList();
 
                 var existingReport = allReports.Where(x => x.ReportId == reportId).FirstOrDefault();
 
@@ -225,11 +216,8 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-<<<<<<< HEAD
+                        ReportInstances = report.ReportInstances,
                         //StartDate = report.NextDate,
-=======
-                        StartDate = report.NextDate,
->>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
                         UserId = vu.id,
                     });
                 }
@@ -242,50 +230,47 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
-        //[Route("api/report/GetReportsByInstanceId/{instanceID}")]
-        //[HttpGet]
-        //public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> GetReportsByInstanceID([FromHeader] string Authorization, [FromQuery] int instanceID)
-        //{
-        //    string JWT = JWTVerify.GetToken(Authorization);
-        //    if (JWT == null)
-        //    {
-        //        return Unauthorized();
-        //    }
+        [Route("api/report/GetReportsByInstanceId/{instanceID}")]
+        [HttpGet]
+        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> GetReportsByInstanceID([FromHeader] string Authorization, [FromQuery] int instanceID)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
 
-        //    HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        string responseBody = await response.Content.ReadAsStringAsync();
-        //        VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-        //        List<Report> allReports = mc.Reports.ToList();
+                List<Report> allReports = mc.Reports.Where( x => x.ReportInstances.All( y => y.Id.Equals(instanceID))).ToList();
 
-        //        List<ReportResponseModel> reportList = new List<ReportResponseModel>();
+                List<ReportResponseModel> reportList = new List<ReportResponseModel>();
 
-        //        foreach (var report in allReports)
-        //        {
-        //            reportList.Add(new ReportResponseModel()
-        //            {
-        //                ReportId = report.ReportId,
-        //                Name = report.Name,
-        //                Query = report.Query,
-        //                Frequency = report.Frequency,
-<<<<<<< HEAD
-        //                //StartDate = report.NextDate,
-=======
-        //                StartDate = report.NextDate,
->>>>>>> 1aabd4f6f55bff7a727267f2bea580a242f843c2
-        //                UserId = vu.id
-        //            });
-        //        }
+                foreach (var report in allReports)
+                {
+                    reportList.Add(new ReportResponseModel()
+                    {
+                        ReportId = report.ReportId,
+                        Name = report.Name,
+                        Query = report.Query,
+                        Frequency = report.Frequency,
+                        ReportInstances = report.ReportInstances,
+                        //StartDate = report.NextDate,
+                        UserId = vu.id
+                    });
+                }
 
-        //        return new ResponseModel<List<ReportResponseModel>>() { data = reportList, newAccessToken = vu.accessToken };
+                return new ResponseModel<List<ReportResponseModel>>() { data = reportList, newAccessToken = vu.accessToken };
 
-        //    }
-        //    else
-        //    {
-        //        return Unauthorized();
-        //    }
-        //}
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
     }
 }
