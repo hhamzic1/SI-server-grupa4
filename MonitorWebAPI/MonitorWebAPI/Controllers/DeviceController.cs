@@ -312,14 +312,9 @@ namespace MonitorWebAPI.Controllers
         }
 
 
-
-
-
-
-
         [Route("api/device/AllDevicesForGroup")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<DevicePagingModel>>> AllDevicesForGroup([FromQuery] int? page, [FromQuery] int? per_page, [FromQuery] string? name, [FromQuery] string? status, [FromQuery] int groupId, string? sort_by, [FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<DevicePagingModel>>> AllDevicesForGroup([FromQuery] int? page, [FromQuery] int? per_page, [FromQuery] string? name, [FromQuery] string? status, [FromQuery] int groupId, string? sort_by, [FromQuery] string? location, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -361,18 +356,17 @@ namespace MonitorWebAPI.Controllers
                                 DeviceUid = dev.DeviceUid
                             });
                         }
-
                         int parsedPage = (page == null || page <= 0) ? 1 : (int)page;
                         int parsedPerPage = (per_page == null || per_page <= 0) ? 10 : (int)per_page;
                         string parsedName = name == null ? "" : name;
+                        string parsedLocation = location == null ? "" : location;
                         string parsedSortBy = sort_by == null ? "" : sort_by;
                         int skip = (parsedPage - 1) * parsedPerPage;
-                        var filteredList = drmList.Skip(skip).Take(parsedPerPage).ToList();
+                        //var filteredList = drmList.Skip(skip).Take(parsedPerPage).ToList();
                         bool onlineStatus = true;
                         if (status == "active") onlineStatus = true;
                         else if (status == "notactive") onlineStatus = false;
-
-                        filteredList = filteredList.FindAll(x => x.Name.Contains(parsedName)).FindAll(s => s.Status == onlineStatus).ToList();
+                        var filteredList = drmList.FindAll(x => x.Name.Contains(parsedName)).FindAll(k => k.Location.Contains(parsedLocation)).FindAll(s => s.Status == onlineStatus).ToList();
                         switch (parsedSortBy)
                         {
                             case "name_asc":
@@ -393,12 +387,18 @@ namespace MonitorWebAPI.Controllers
                             case "status_desc":
                                 filteredList = filteredList.OrderByDescending(x => x.Status).ToList();
                                 break;
+                            case "LastTimeOnline_asc":
+                                filteredList = filteredList.OrderBy(x => x.LastTimeOnline).ToList();
+                                break;
+                            case "LastTimeOnline_desc":
+                                filteredList = filteredList.OrderByDescending(x => x.LastTimeOnline).ToList();
+                                break;
                             default:
                                 filteredList = filteredList.OrderBy(x => x.DeviceId).ToList();
                                 break;
                         }
-
-                        return new ResponseModel<DevicePagingModel>() { data = new DevicePagingModel() { Devices=filteredList, DeviceCount=allDevices.Count}, newAccessToken = vu.accessToken };
+                        filteredList = filteredList.Skip(skip).Take(parsedPerPage).ToList();
+                        return new ResponseModel<DevicePagingModel>() { data = new DevicePagingModel() { Devices = filteredList, DeviceCount = allDevices.Count }, newAccessToken = vu.accessToken };
                     }
                     else
                     {
@@ -409,7 +409,6 @@ namespace MonitorWebAPI.Controllers
                 {
                     return BadRequest(e.Message);
                 }
-
             }
             else
             {
