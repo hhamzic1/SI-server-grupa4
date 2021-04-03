@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MonitorWebAPI.Models
 {
@@ -10,5 +11,6 @@ namespace MonitorWebAPI.Models
         public string Frequency { get; set; }
         public DateTime StartDate { get; set; }
         public int UserId { get; set; }
+        public ICollection<ReportInstance> ReportInstances { get; set; }
     }
 }
