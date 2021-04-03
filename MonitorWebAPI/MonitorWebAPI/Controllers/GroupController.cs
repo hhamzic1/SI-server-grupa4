@@ -144,6 +144,13 @@ namespace MonitorWebAPI.Controllers
                         Group tempGroup = mc.Groups.Where(x => x.GroupId == id).FirstOrDefault();
                         if (tempGroup != null)
                         {
+                            var deviceGroups = mc.DeviceGroups.Where(x => x.GroupId == tempGroup.ParentGroup).ToList();
+                            foreach (var temp in deviceGroups)
+                            {
+                                temp.GroupId = id;
+                                mc.DeviceGroups.Attach(temp).Property(y => y.GroupId).IsModified = true;
+                                mc.SaveChanges();
+                            }
                             return new ResponseModel<Group>() { data = tempGroup, newAccessToken = vu.accessToken };
                         }
                         throw new Exception("Group wasn't added succesfully");
