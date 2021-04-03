@@ -1,20 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {}
+    "C:\\Users\\Mirza\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {}
   },
   "projects": {
-    "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {
+    "C:\\Users\\Mirza\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+        "projectUniqueName": "C:\\Users\\Mirza\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
         "projectName": "MonitorWebAPI",
-        "projectPath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
-        "packagesPath": "C:\\Users\\who.so\\.nuget\\packages\\",
-        "outputPath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
+        "projectPath": "C:\\Users\\Mirza\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+        "packagesPath": "C:\\Users\\Mirza\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Mirza\\Source\\Repos\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\who.so\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Mirza\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
