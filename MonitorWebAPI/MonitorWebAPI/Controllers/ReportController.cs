@@ -232,7 +232,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/report/GetReportsByInstanceId/{instanceID}")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> GetReportsByInstanceID([FromHeader] string Authorization, [FromQuery] int instanceID)
+        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> GetReportsByInstanceID([FromHeader] string Authorization, int instanceID)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
