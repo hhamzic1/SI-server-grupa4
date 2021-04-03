@@ -199,9 +199,9 @@ namespace MonitorWebAPI.Controllers
 
 
 
-        [Route("api/device/CheckIfDeviceBelongsToUser/{deviceId}")]
+        [Route("api/device/CheckIfDeviceBelongsToUser/{deviceUid}")]
         [HttpGet]
-        public async Task<ActionResult> CheckIfDeviceBelongsToUser([FromHeader] string Authorization, int deviceId)
+        public async Task<ActionResult> CheckIfDeviceBelongsToUser([FromHeader] string Authorization, Guid deviceUid)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -211,12 +211,17 @@ namespace MonitorWebAPI.Controllers
             HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
             if (response.IsSuccessStatusCode)
             {
+                Device device = mc.Devices.Where(x => x.DeviceUid == deviceUid).FirstOrDefault();
+                if(device==null)
+                {
+                    return NotFound();
+                }
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                 try
                 {
-                    if(userRoleName=="MonitorSuperAdmin" || (userRoleName=="SuperAdmin" && helperMethod.CheckIfDeviceBelongsToUsersTree(vu,deviceId)))
+                    if(userRoleName=="MonitorSuperAdmin" || (userRoleName=="SuperAdmin" && helperMethod.CheckIfDeviceBelongsToUsersTree(vu,device.DeviceId)))
                     {
                         return StatusCode(200);
                     }
