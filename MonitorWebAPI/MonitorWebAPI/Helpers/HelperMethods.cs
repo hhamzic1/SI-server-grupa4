@@ -156,6 +156,43 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
+        public static void CronJob()
+        {
+            DateTime now = DateTime.Now;
+            DateTime dateTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0);
+            monitorContext mc = new monitorContext();
+            List<Report> reports = mc.Reports.ToList();
+            
+            foreach (var rep in reports)
+            {
+                if (rep.NextDate.Equals(dateTime))
+                {
+
+                    if (rep.Frequency.Equals("Weekly"))
+                    {
+                        mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
+                        rep.NextDate = rep.NextDate.AddDays(7);
+
+                    } else if (rep.Frequency.Equals("Monthly"))
+                    {
+                        
+                        mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
+                        rep.NextDate = rep.NextDate.AddMonths(1);
+                    } else if (rep.Frequency.Equals("Daily"))
+                    {
+                        
+                        mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
+                        rep.NextDate = rep.NextDate.AddDays(1);
+                    }
+
+                    mc.SaveChanges();
+
+                }
+
+            }
+
+        }
+
         public List<Device> GetDevicesForGHM(GroupHierarchyModel ghm)
         {
             List<Device> deviceList = new List<Device>();

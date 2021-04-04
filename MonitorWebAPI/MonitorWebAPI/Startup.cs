@@ -11,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.MemoryStorage;
+
 
 namespace MonitorWebAPI
 {
@@ -41,10 +44,22 @@ namespace MonitorWebAPI
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Monitor Server Test Service", Version = "v1", });
                 c.CustomSchemaIds(x => x.FullName);
             });
+
+            services.AddHangfire(config => 
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseDefaultTypeSerializer()
+                .UseMemoryStorage());
+            
+            services.AddHangfireServer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IBackgroundJobClient backgroundJobCilent,
+            IRecurringJobManager recurringJobManager)
         {
         
             if (env.IsDevelopment())
@@ -71,6 +86,14 @@ namespace MonitorWebAPI
             {
                 endpoints.MapControllers();
             });
+
+            app.UseHangfireDashboard();
+
+            recurringJobManager.AddOrUpdate(
+                "Fetch all report requests",
+                () => Helpers.HelperMethods.CronJob(),
+                Cron.Hourly
+            );
         }
     }
 }

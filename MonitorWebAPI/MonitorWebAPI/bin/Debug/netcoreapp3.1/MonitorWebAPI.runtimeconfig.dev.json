@@ -1,8 +1,8 @@
 {
   "runtimeOptions": {
     "additionalProbingPaths": [
-      "C:\\Users\\who.so\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\who.so\\.nuget\\packages"
+      "/Users/farismusic/.dotnet/store/|arch|/|tfm|",
+      "/Users/farismusic/.nuget/packages"
     ]
   }
 }
