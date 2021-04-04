@@ -12,15 +12,20 @@ Potrebno je skinuti projekat sa github repozitorija i otvoriti ga pomoću Visual
 
 ## User stories
 Sprint 1:
+
     • Kao korisnik-administrator želim da imam mogućnost kreiranja i pregledanja mašina koje se servisiraju
     • Kao obični korisnik želim da se omogući pregledanje statusa mašina iz moje grupe
+    
 Sprint 2:
+
     • Kao obični korisnik želim da se omogući pretraga mašina po nazivu, statusu
     • Kao obični korisnik želim da se omogući paginacija mašina koje mi pripadaju i da se omogući sortiranje istih po nazivu, statusu i lokaciji
     Dodatni feature:
         • Omogućeno web/mobile aplikaciji hijerarhijski prikaz grupa, kao i dobavljanje svih uređaja koji pripadaju trenutno logovanom korisniku. Nad tim
         uređajima je moguće raditi gore navedene zahtjeve
+      
 Sprint 3:
+
     • Kao korisnik želim da se omogući mogućnost upload slika u folder koji je na mašini
     • Kao korisnik želim da se omogući pregled srednje vrijednosti korištenja hardvera mašina
     • Kao korisnik želim da se omogući mogućnost pregleda da li je mašina pod mojom ovlasti
