@@ -363,11 +363,12 @@ namespace MonitorWebAPI.Controllers
                         string parsedLocation = location == null ? "" : location;
                         string parsedSortBy = sort_by == null ? "" : sort_by;
                         int skip = (parsedPage - 1) * parsedPerPage;
-                        //var filteredList = drmList.Skip(skip).Take(parsedPerPage).ToList();
                         bool onlineStatus = true;
                         if (status == "active") onlineStatus = true;
                         else if (status == "notactive") onlineStatus = false;
-                        var filteredList = drmList.FindAll(x => x.Name.Contains(parsedName)).FindAll(k => k.Location.Contains(parsedLocation)).FindAll(s => s.Status == onlineStatus).ToList();
+                        var filteredList = drmList
+                            .FindAll(x => (name != null && x.Name.Contains(parsedName, StringComparison.InvariantCultureIgnoreCase)) || (location != null && x.Location.Contains(parsedLocation, StringComparison.InvariantCultureIgnoreCase)))
+                            .FindAll(s => s.Status == onlineStatus).ToList();
                         switch (parsedSortBy)
                         {
                             case "name_asc":
@@ -399,7 +400,7 @@ namespace MonitorWebAPI.Controllers
                                 break;
                         }
                         filteredList = filteredList.Skip(skip).Take(parsedPerPage).ToList();
-                        return new ResponseModel<DevicePagingModel>() { data = new DevicePagingModel() { Devices = filteredList, DeviceCount = allDevices.Count }, newAccessToken = vu.accessToken };
+                        return new ResponseModel<DevicePagingModel>() { data = new DevicePagingModel() { Devices = filteredList, DeviceCount = filteredList.Count }, newAccessToken = vu.accessToken };
                     }
                     else
                     {
