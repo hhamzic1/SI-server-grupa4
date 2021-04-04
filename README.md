@@ -26,9 +26,9 @@ Sprint 2:
       
 Sprint 3:
 
-    • Kao korisnik želim da se omogući mogućnost upload slika u folder koji je na mašini
+    • Kao korisnik želim da se omogući upload slika u folder koji je na mašini
     • Kao korisnik želim da se omogući pregled srednje vrijednosti korištenja hardvera mašina
-    • Kao korisnik želim da se omogući mogućnost pregleda da li je mašina pod mojom ovlasti
+    • Kao korisnik želim da se omogući pregleda da li je mašina pod mojom ovlasti
     • Kao korisnik želim da se omogući pregled mašine po njenom instalacijskom kodu prvi put nakon čega taj instalacijski kod ističe i ne može se više koristiti
 
 
@@ -99,7 +99,7 @@ Sprint 3:
   
   [HttpPost]
   
-  * Omogućuje upload file-a u bazu podataka
+  * Omogućuje upload file-a u folder koji je na mašini
 
 ### Rute za grupe
 
