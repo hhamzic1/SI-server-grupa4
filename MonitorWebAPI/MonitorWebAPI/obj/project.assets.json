@@ -9323,24 +9323,26 @@
     ]
   },
   "packageFolders": {
-    "/Users/farismusic/.nuget/packages/": {}
+    "C:\\Users\\who.so\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/farismusic/Desktop/SI-server-grupa4/MonitorWebAPI/MonitorWebAPI/MonitorWebAPI.csproj",
+      "projectUniqueName": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
       "projectName": "MonitorWebAPI",
-      "projectPath": "/Users/farismusic/Desktop/SI-server-grupa4/MonitorWebAPI/MonitorWebAPI/MonitorWebAPI.csproj",
-      "packagesPath": "/Users/farismusic/.nuget/packages/",
-      "outputPath": "/Users/farismusic/Desktop/SI-server-grupa4/MonitorWebAPI/MonitorWebAPI/obj/",
+      "projectPath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\MonitorWebAPI.csproj",
+      "packagesPath": "C:\\Users\\who.so\\.nuget\\packages\\",
+      "outputPath": "E:\\etf\\3. godina\\6. semestar\\SI\\SI-server-grupa4\\MonitorWebAPI\\MonitorWebAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/farismusic/.config/NuGet/NuGet.Config"
+        "C:\\Users\\who.so\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -9434,7 +9436,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.201/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }
