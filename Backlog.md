@@ -26,3 +26,18 @@ App must provide possibility for searching and pagination of devices
 - Commit and push on your branch
 - Create a pull request
 - Merge branches
+
+## Feature 
+View average hardware usage of devices, file upload to folder on device and find device by installation code
+### Item
+App must provide possibility for viewing the average hardware usage for user's devices during a specified time period or a month by default, uploading file to a folder on the device and finding device by installation code first time after which the installation code expires.
+#### Task
+- Create a new branch and switch to it
+- Re-scaffold model from the database
+- Create route for device average hardware usage
+- Create route for file upload
+- Create route for finding device by installation code
+- Create route to check if device belongs to user
+- Commit and push on your branch
+- Create a pull request
+- Merge branches
