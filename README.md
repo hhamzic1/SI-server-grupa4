@@ -21,7 +21,7 @@ Sprint 2:
         • Omogućeno web/mobile aplikaciji hijerarhijski prikaz grupa, kao i dobavljanje svih uređaja koji pripadaju trenutno logovanom korisniku. Nad tim
         uređajima je moguće raditi gore navedene zahtjeve
 Sprint 3:
-    • Kao korisnik želim da se omogući mogućnost upload slika na server
+    • Kao korisnik želim da se omogući mogućnost upload slika u bazu podataka
     • Kao korisnik želim da se omogući pregled srednje vrijednosti korištenja hardvera
     • Kao korisnik želim da se omogući mogućnost pregleda da li je mašina pod mojom ovlasti
     • Kao korisnik želim da se omogući pregled mašine po njenom instalacijskom kodu prvi put nakon čega se taj instalacijski kod više ne može koristiti
@@ -94,7 +94,7 @@ Sprint 3:
   
   [HttpPost]
   
-  * Omogućuje upload file-a na 
+  * Omogućuje upload file-a u bazu podataka
 
 ### Rute za grupe
 
