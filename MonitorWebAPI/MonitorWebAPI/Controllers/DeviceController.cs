@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MonitorWebAPI.Controllers
@@ -460,5 +461,156 @@ namespace MonitorWebAPI.Controllers
             }
             return StatusCode(403);
         }
+
+
+
+        [HttpPut("/api/device/{groupId?}")]
+        public async Task<ActionResult<ResponseModel<Device>>> PutDevice(int? groupId, [FromBody] Device newDevice, [FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                try
+                {
+
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                    string username = mc.Users.First(x => x.UserId == vu.id).Name;
+                    var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
+                    Device device = mc.Devices.Where(x => x.DeviceUid == newDevice.DeviceUid).FirstOrDefault();
+                    try
+                    {
+                        if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfDeviceBelongsToUsersTree(vu, device.DeviceId)))
+                        {
+
+
+                            try
+                            {
+                                mc.Devices.Attach(device);
+                                device.Name = newDevice.Name;
+                                device.Location = newDevice.Location;
+                                device.LocationLatitude = newDevice.LocationLatitude;
+                                device.LocationLongitude = newDevice.LocationLongitude;
+                                device.Status = newDevice.Status;
+                                device.LastTimeOnline = DateTime.Now;
+                                if (newDevice.InstallationCode != null)
+                                {
+                                    device.InstallationCode = newDevice.InstallationCode;
+                                }
+
+
+                                mc.SaveChanges();
+
+                                if (groupId != null)
+                                {
+                                    int groups = mc.Groups.Where(x => x.ParentGroup == groupId).Count();
+                                    if (groups == 0)
+                                    {
+                                        DeviceGroup tempDeviceGroup = mc.DeviceGroups.Where(x => x.DeviceId == device.DeviceId).FirstOrDefault();
+                                        mc.Attach(tempDeviceGroup);
+                                        tempDeviceGroup.GroupId = groupId;
+                                        mc.SaveChanges();
+                                    }
+                                }
+                                HttpResponseMessage configFileResponse = HelperMethods.GetConfigFile(JWT, newDevice.DeviceUid, "config.json", username).Result;
+                                if (configFileResponse.IsSuccessStatusCode)
+                                {
+                                    try
+                                    {
+                                        string configFileResponseBody = await configFileResponse.Content.ReadAsStringAsync();
+
+                                        ConfigGetJSON responseJson = JsonConvert.DeserializeObject<ConfigGetJSON>(configFileResponseBody);
+                                        var blob = Convert.FromBase64String(responseJson.base64);
+                                        var json = Encoding.UTF8.GetString(blob);
+
+                                        ConfigJS cjson = JsonConvert.DeserializeObject<ConfigJS>(json);
+                                        ConfigJS.FileLocations paths = cjson.fileLocations;
+
+
+
+
+                                        ConfigJS config = new ConfigJS()
+                                        {
+                                            name = device.Name,
+                                            location = device.Location,
+                                            deviceUid = device.DeviceUid,
+                                            keepAlive = 30,
+                                            webSocketUrl = cjson.webSocketUrl,
+                                            pingUri = "ping",
+                                            mainUri = cjson.mainUri,
+                                            fileUri = "ws",
+                                            installationCode = null,
+                                            fileLocations = new ConfigJS.FileLocations()
+                                            {
+                                                File1 = paths.File1,
+                                                File2 = paths.File2,
+                                                File3 = paths.File3,
+                                                File4 = paths.File4,
+                                                File5 = paths.File5
+                                            }
+                                        };
+
+                                        var jsonData = JsonConvert.SerializeObject(config);
+                                        string base64EncodedExternalAccount = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonData));
+
+
+                                        HttpResponseMessage configFileResponse2 = HelperMethods.PostConfigFile(JWT, newDevice.DeviceUid, "config.json", username, base64EncodedExternalAccount).Result;
+                                        if (configFileResponse2.IsSuccessStatusCode)
+                                        {
+                                            if ((int)configFileResponse2.StatusCode == 210)
+                                            {
+                                                return StatusCode(201);
+                                            }
+
+                                            return StatusCode(200);
+                                        }
+                                        else
+                                        {
+                                            return StatusCode(403);
+                                        }
+
+                                    }
+                                    catch
+                                    {
+                                        return StatusCode(403);
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                return StatusCode(403);
+                            }
+
+                        }
+                        else
+                        {
+                            return StatusCode(403);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("Device info hasn't been changed successfully1");
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Device info hasn't been changed successfully2");
+                }
+
+                return NoContent();
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+
     }
 }

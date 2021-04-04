@@ -1,7 +1,13 @@
 ﻿using MonitorWebAPI.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace MonitorWebAPI.Helpers
 {
     public class HelperMethods
@@ -199,6 +205,37 @@ namespace MonitorWebAPI.Helpers
             GetDeviceList(ghm, ref deviceList);
 
             return deviceList;
+        }
+
+        public static async Task<HttpResponseMessage> GetConfigFile(string JWT, Guid deviceUID, string fileName, string username)
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWT);
+
+
+            var values = new Dictionary<string, string>
+            {
+                {"deviceUid", deviceUID.ToString()}, {"fileName", fileName}, {"path", ""}, {"user", username}
+            };
+            var content = JsonConvert.SerializeObject(values, Formatting.Indented);
+
+            var data = new StringContent(content, Encoding.UTF8, "application/json");
+            return await client.PostAsync("https://si-grupa5.herokuapp.com/api/web/agent/file/get", data);
+        }
+
+        public static async Task<HttpResponseMessage> PostConfigFile(string JWT, Guid deviceUID, string fileName, string username, string base64)
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWT);
+
+            var values = new Dictionary<string, string>
+            {
+                {"deviceUid", deviceUID.ToString()}, {"fileName", fileName}, {"path", ""}, {"base64", base64}, {"user", username}
+            };
+            var content = JsonConvert.SerializeObject(values, Formatting.Indented);
+
+            var data = new StringContent(content, Encoding.UTF8, "application/json");
+            return await client.PostAsync("https://si-grupa5.herokuapp.com/api/web/agent/file/put", data);
         }
 
 
