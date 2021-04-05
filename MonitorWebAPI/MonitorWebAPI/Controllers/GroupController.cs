@@ -171,6 +171,50 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
+        [HttpPut("/api/group/{groupId}")]
+        public async Task<ActionResult<ResponseModel<Group>>> PutGroup(int groupId, [FromBody] Group newGroup, [FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                try
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                    var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
+                    if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId)))
+                    {
+                        Group group = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+                        if (group == null)
+                        {
+                            throw new Exception("Group with that id doesn't exist");
+                        }
+                        mc.Groups.Attach(group);
+                        group.Name = newGroup.Name;
+                        mc.SaveChanges();
+                        return new ResponseModel<Group>() { data = group, newAccessToken = vu.accessToken };
+                    }
+                    else
+                    {
+                        return StatusCode(403, "You don't have access to this group!");
+                    }
+                }
+                catch (Exception e)
+                {
+                    return StatusCode(404,"Group name wasn't changed successfully. "+e.Message);
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
     }
 
 
