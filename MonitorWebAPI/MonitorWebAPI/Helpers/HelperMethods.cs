@@ -168,24 +168,25 @@ namespace MonitorWebAPI.Helpers
             DateTime dateTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0);
             monitorContext mc = new monitorContext();
             List<Report> reports = mc.Reports.ToList();
-            
+
             foreach (var rep in reports)
             {
+                rep.NextDate = dateTime;
                 if (rep.NextDate.Equals(dateTime))
                 {
-                    if (rep.Frequency.Equals("Weekly"))
+                    if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(7);
 
-                    } else if (rep.Frequency.Equals("Monthly"))
+                    } else if (rep.Frequency.Equals("Monthly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddMonths(1);
 
-                    } else if (rep.Frequency.Equals("Daily"))
+                    } else if (rep.Frequency.Equals("Daily", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(1);
 
-                    } else if (rep.Frequency.Equals("Yearly"))
+                    } else if (rep.Frequency.Equals("Yearly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddYears(1);
 
