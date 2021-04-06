@@ -171,7 +171,7 @@ namespace MonitorWebAPI.Helpers
 
             foreach (var rep in reports)
             {
-                rep.NextDate = dateTime;
+                
                 if (rep.NextDate.Equals(dateTime))
                 {
                     if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
