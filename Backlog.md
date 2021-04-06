@@ -30,7 +30,7 @@ App must provide possibility for searching and pagination of devices
 ## Feature 
 View average hardware usage of devices, file upload to folder on device and find device by installation code
 ### Item
-App must provide possibility for viewing the average hardware usage for user's devices during a specified time period or a month by default, uploading file to a folder on the device and finding device by installation code first time after which the installation code expires.
+App must provide possibility for viewing the average hardware usage for user's devices during a specified time period or from the beginning to until now by default, uploading file to a folder on the device and finding device by installation code first time after which the installation code expires.
 #### Task
 - Create a new branch and switch to it
 - Re-scaffold model from the database
