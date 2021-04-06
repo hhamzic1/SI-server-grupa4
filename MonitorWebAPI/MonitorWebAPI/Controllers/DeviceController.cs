@@ -540,11 +540,11 @@ namespace MonitorWebAPI.Controllers
                                         name = device.Name,
                                         location = device.Location,
                                         deviceUid = device.DeviceUid,
-                                        keepAlive = 30,
+                                        keepAlive = cjson.keepAlive,
                                         webSocketUrl = cjson.webSocketUrl,
-                                        pingUri = "ping",
+                                        pingUri = cjson.pingUri,
                                         mainUri = cjson.mainUri,
-                                        fileUri = "ws",
+                                        fileUri = cjson.fileUri,
                                         installationCode = device.InstallationCode,
                                         fileLocations = new ConfigJS.FileLocations()
                                         {
@@ -564,10 +564,10 @@ namespace MonitorWebAPI.Controllers
                                         location = device.Location,
                                         deviceUid = device.DeviceUid,
                                         keepAlive = 30,
-                                        webSocketUrl = "ws",
-                                        pingUri = "ping",
+                                        webSocketUrl = "si-grupa5.herokuapp.com",
+                                        pingUri = "https://si-2021.167.99.244.168.nip.io:3000/liveStatus",
                                         mainUri = "https://si-2021.167.99.244.168.nip.io/api/device/GetDeviceByInstallationCode/",
-                                        fileUri = "ws",
+                                        fileUri = "https://si-2021.167.99.244.168.nip.io:3000/errorLog",
                                         installationCode = device.InstallationCode,
                                         fileLocations = new ConfigJS.FileLocations()
                                         {
