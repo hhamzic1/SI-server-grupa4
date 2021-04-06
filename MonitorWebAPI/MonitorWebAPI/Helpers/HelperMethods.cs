@@ -173,24 +173,25 @@ namespace MonitorWebAPI.Helpers
             {
                 if (rep.NextDate.Equals(dateTime))
                 {
-
                     if (rep.Frequency.Equals("Weekly"))
                     {
-                        mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
                         rep.NextDate = rep.NextDate.AddDays(7);
 
                     } else if (rep.Frequency.Equals("Monthly"))
                     {
-                        
-                        mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
                         rep.NextDate = rep.NextDate.AddMonths(1);
+
                     } else if (rep.Frequency.Equals("Daily"))
                     {
-                        
-                        mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
                         rep.NextDate = rep.NextDate.AddDays(1);
+
+                    } else if (rep.Frequency.Equals("Yearly"))
+                    {
+                        rep.NextDate = rep.NextDate.AddYears(1);
+
                     }
 
+                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
                     mc.SaveChanges();
 
                 }
