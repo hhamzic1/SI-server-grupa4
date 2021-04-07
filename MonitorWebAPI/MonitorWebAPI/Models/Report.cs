@@ -19,7 +19,7 @@ namespace MonitorWebAPI.Models
         public string Frequency { get; set; }
         public string Query { get; set; }
         public bool? SendEmail { get; set; }
-        public bool? Deleted { get; set; }
+        public bool Deleted { get; set; }
 
         public virtual User User { get; set; }
         public virtual ICollection<ReportInstance> ReportInstances { get; set; }
