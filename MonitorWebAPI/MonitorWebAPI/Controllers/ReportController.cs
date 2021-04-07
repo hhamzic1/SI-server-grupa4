@@ -38,7 +38,10 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                List<Report> allReports = mc.Reports.Where(x => x.UserId == vu.id).ToList();
+                List<Report> allReports = mc.Reports
+                    .Where(x => x.UserId == vu.id)
+                    .Where(x => x.Deleted == false)
+                    .ToList();
 
                 List<ReportResponseModel> reportList = new List<ReportResponseModel>();
 
@@ -51,7 +54,7 @@ namespace MonitorWebAPI.Controllers
                         Query = report.Query,
                         Frequency = report.Frequency,
                         ReportInstances = report.ReportInstances,
-                        //StartDate = report.StartDate,
+                        NextDate = report.NextDate,
                         UserId = vu.id
                     });
                 }
@@ -82,7 +85,7 @@ namespace MonitorWebAPI.Controllers
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
                 List<Report> allReports = mc.Reports.ToList()
-                    //.Where(x => x.Deleted == false)
+                    .Where(x => x.Deleted == false)
                     .ToList();
 
                 if (!string.IsNullOrEmpty(queryReport.Frequency))
@@ -117,7 +120,7 @@ namespace MonitorWebAPI.Controllers
                         Query = report.Query,
                         Frequency = report.Frequency,
                         ReportInstances = report.ReportInstances,
-                        //StartDate = report.NextDate,
+                        NextDate = report.NextDate,
                         UserId = vu.id
                     });
                 }
@@ -157,7 +160,7 @@ namespace MonitorWebAPI.Controllers
                         Query = report.Query,
                         Frequency = report.Frequency,
                         ReportInstances = report.ReportInstances,
-                        //StartDate = report.NextDate,
+                        NextDate = report.NextDate,
                         UserId = vu.id
                     };
 
@@ -181,7 +184,7 @@ namespace MonitorWebAPI.Controllers
         }
 
         [Route("api/report/StopReport/{reportId}")]
-        [HttpPut]
+        [HttpPatch]
         public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> StopReport([FromHeader] string Authorization, int reportId)
         {
             string JWT = JWTVerify.GetToken(Authorization);
@@ -196,7 +199,7 @@ namespace MonitorWebAPI.Controllers
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
                 List<Report> allReports = mc.Reports
-                    //.Where(x => x.Deleted == false)
+                    .Where(x => x.Deleted == false)
                     .ToList();
 
                 var existingReport = allReports.Where(x => x.ReportId == reportId).FirstOrDefault();
@@ -217,7 +220,7 @@ namespace MonitorWebAPI.Controllers
                         Query = report.Query,
                         Frequency = report.Frequency,
                         ReportInstances = report.ReportInstances,
-                        //StartDate = report.NextDate,
+                        NextDate = report.NextDate,
                         UserId = vu.id,
                     });
                 }
@@ -230,9 +233,9 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
-        [Route("api/report/GetReportsByInstanceId/{instanceID}")]
+        [Route("api/report/GetReportsByReportInstanceId/{instanceID}")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> GetReportsByInstanceID([FromHeader] string Authorization, int instanceID)
+        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> GetReportsByReportInstanceID([FromHeader] string Authorization, int instanceID)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -246,7 +249,10 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                List<Report> allReports = mc.Reports.Where(x => x.ReportInstances.All(y => y.Id.Equals(instanceID))).ToList();
+                List<Report> allReports = mc.Reports
+                    .Where(x => x.ReportInstances.All(y => y.Id.Equals(instanceID)))
+                    .Where(x => x.Deleted == false)
+                    .ToList();
 
                 List<ReportResponseModel> reportList = new List<ReportResponseModel>();
 
@@ -259,12 +265,65 @@ namespace MonitorWebAPI.Controllers
                         Query = report.Query,
                         Frequency = report.Frequency,
                         ReportInstances = report.ReportInstances,
-                        //StartDate = report.NextDate,
+                        NextDate = report.NextDate,
                         UserId = vu.id
                     });
                 }
 
                 return new ResponseModel<List<ReportResponseModel>>() { data = reportList, newAccessToken = vu.accessToken };
+
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [Route("api/report/GetReportInstances")]
+        [HttpGet]
+        public async Task<ActionResult<ResponseModel<List<ReportInstanceResponseModel>>>> GetReportInstances([FromHeader] string Authorization, [FromQuery] ReportInstanceResponseModel queryReportInstance)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+
+                List<ReportInstance> allReportInstances = mc.ReportInstances
+                    .ToList();
+
+                if (!string.IsNullOrEmpty(queryReportInstance.UriLink))
+                {
+                    allReportInstances = allReportInstances.Where(x => x.UriLink.Contains(queryReportInstance.UriLink)).ToList();
+                }
+                if (!string.IsNullOrEmpty(queryReportInstance.ReportId.ToString()) && queryReportInstance.ReportId != 0)
+                {
+                    allReportInstances = allReportInstances.Where(x => x.ReportId == queryReportInstance.ReportId).ToList();
+                }
+                if (!string.IsNullOrEmpty(queryReportInstance.Name))
+                {
+                    allReportInstances = allReportInstances.Where(x => x.Name.Contains(queryReportInstance.Name)).ToList();
+                }
+
+                List<ReportInstanceResponseModel> reportList = new List<ReportInstanceResponseModel>();
+
+                foreach (var report in allReportInstances)
+                {
+                    reportList.Add(new ReportInstanceResponseModel()
+                    {
+                        ReportId = report.ReportId,
+                        Name = report.Name,
+                        UriLink = report.UriLink
+                    });
+                }
+
+                return new ResponseModel<List<ReportInstanceResponseModel>>() { data = reportList, newAccessToken = vu.accessToken };
 
             }
             else
