@@ -319,7 +319,8 @@ namespace MonitorWebAPI.Controllers
                     {
                         ReportId = report.ReportId,
                         Name = report.Name,
-                        UriLink = report.UriLink
+                        UriLink = report.UriLink,
+                        Date = report.Date
                     });
                 }
 

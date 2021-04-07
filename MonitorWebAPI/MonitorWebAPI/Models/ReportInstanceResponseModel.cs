@@ -9,5 +9,6 @@ namespace MonitorWebAPI.Models
         public int ReportId { get; set; }
         public string Name { get; set; }
         public string UriLink { get; set; }
+        public DateTime? Date { get; set; }
     }
 }
