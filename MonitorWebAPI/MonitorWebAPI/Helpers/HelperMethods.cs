@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Mail;
+using System.Net;
 
 namespace MonitorWebAPI.Helpers
 {
@@ -172,8 +174,9 @@ namespace MonitorWebAPI.Helpers
             foreach (var rep in reports)
             {
                 
-                if (rep.NextDate.Equals(dateTime))
+                if (TimeZoneInfo.ConvertTimeToUtc(rep.NextDate).Equals(dateTime))
                 {
+                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + TimeZoneInfo.ConvertTimeToUtc(rep.NextDate), ReportId = rep.ReportId, UriLink = "ftp://..." });
                     if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(7);
@@ -192,10 +195,18 @@ namespace MonitorWebAPI.Helpers
 
                     }
 
-                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
                     mc.SaveChanges();
 
                 }
+
+                //var smptClient = new SmtpClient("smtp.gmail.com")
+                //{
+                //    Port = 587,
+                //    Credentials = new NetworkCredential("email", "pass"),
+                //    EnableSsl = true
+                //};
+
+                //smptClient.Send("sender email", "receipement", "subject", "body");
 
             }
 
