@@ -29,6 +29,7 @@ namespace MonitorWebAPI.Models
         public virtual DbSet<SecurityQuestion> SecurityQuestions { get; set; }
         public virtual DbSet<TaskStatus> TaskStatuses { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserCommandsLog> UserCommandsLogs { get; set; }
         public virtual DbSet<UserGroup> UserGroups { get; set; }
         public virtual DbSet<UserSecurityQuestion> UserSecurityQuestions { get; set; }
         public virtual DbSet<UserTask> UserTasks { get; set; }
@@ -256,6 +257,8 @@ namespace MonitorWebAPI.Models
                 entity.HasIndex(e => e.UserId, "user_userid_uindex")
                     .IsUnique();
 
+                entity.Property(e => e.Address).HasMaxLength(200);
+
                 entity.Property(e => e.Email)
                     .IsRequired()
                     .HasMaxLength(50);
@@ -281,6 +284,29 @@ namespace MonitorWebAPI.Models
                     .HasForeignKey(d => d.RoleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("user_role__fk");
+            });
+
+            modelBuilder.Entity<UserCommandsLog>(entity =>
+            {
+                entity.ToTable("USER_COMMANDS_LOG");
+
+                entity.Property(e => e.Id).HasDefaultValueSql("nextval('\"user_commands_log_Id_seq\"'::regclass)");
+
+                entity.Property(e => e.Command).IsRequired();
+
+                entity.Property(e => e.Time).HasColumnType("timestamp with time zone");
+
+                entity.HasOne(d => d.Device)
+                    .WithMany(p => p.UserCommandsLogs)
+                    .HasForeignKey(d => d.DeviceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("user_commands_log_device_deviceid_fk");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserCommandsLogs)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("user_commands_log_user_userid_fk");
             });
 
             modelBuilder.Entity<UserGroup>(entity =>

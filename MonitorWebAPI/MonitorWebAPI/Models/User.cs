@@ -10,6 +10,7 @@ namespace MonitorWebAPI.Models
         public User()
         {
             Reports = new HashSet<Report>();
+            UserCommandsLogs = new HashSet<UserCommandsLog>();
             UserGroups = new HashSet<UserGroup>();
             UserTasks = new HashSet<UserTask>();
         }
@@ -22,9 +23,12 @@ namespace MonitorWebAPI.Models
         public int RoleId { get; set; }
         public string Password { get; set; }
         public string QrSecret { get; set; }
+        public string Address { get; set; }
+        public bool? EmailVerified { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual ICollection<Report> Reports { get; set; }
+        public virtual ICollection<UserCommandsLog> UserCommandsLogs { get; set; }
         public virtual ICollection<UserGroup> UserGroups { get; set; }
         public virtual ICollection<UserTask> UserTasks { get; set; }
     }

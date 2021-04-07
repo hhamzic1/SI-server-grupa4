@@ -11,6 +11,7 @@ namespace MonitorWebAPI.Models
         {
             DeviceGroups = new HashSet<DeviceGroup>();
             ErrorLogs = new HashSet<ErrorLog>();
+            UserCommandsLogs = new HashSet<UserCommandsLog>();
             UserTasks = new HashSet<UserTask>();
         }
 
@@ -26,6 +27,7 @@ namespace MonitorWebAPI.Models
 
         public virtual ICollection<DeviceGroup> DeviceGroups { get; set; }
         public virtual ICollection<ErrorLog> ErrorLogs { get; set; }
+        public virtual ICollection<UserCommandsLog> UserCommandsLogs { get; set; }
         public virtual ICollection<UserTask> UserTasks { get; set; }
     }
 }
