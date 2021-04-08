@@ -89,59 +89,5 @@ namespace MonitorWebAPI.Controllers
                 return Unauthorized();
             }
         }
-
-        [HttpGet]
-        [Route("api/upload/GetImagesForUserTask")]
-        public async Task<ActionResult<ResponseModel<List<ImageModel>>>> GetImagesForUserTask([FromHeader] string Authorization, Guid deviceUid, int taskId)
-        {
-            List<ImageModel> images = new List<ImageModel>();
-            string JWT = JWTVerify.GetToken(Authorization);
-            if (JWT == null)
-            {
-                return Unauthorized();
-            }
-            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                string responseBody = await response.Content.ReadAsStringAsync();
-                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
-                try
-                {
-
-                    int deviceId = mc.Devices.Where(x => x.DeviceUid == deviceUid).FirstOrDefault().DeviceId;
-                    var tempTask = mc.UserTasks.Where(x => x.UserId == vu.id && x.TaskId == taskId).FirstOrDefault();
-                    if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && tempTask != null && hm.CheckIfDeviceBelongsToUsersTree(vu, deviceId)))
-                    {
-
-                        var folderName = Path.Combine("Uploads", "Files");
-                        var loadPath = Path.Combine(hostingEnvironment.ContentRootPath, folderName);
-                        string matching = deviceUid + "_" + taskId + '*';
-                        foreach (string file in Directory.GetFiles(loadPath, matching))
-                        {
-                            byte[] bytes = System.IO.File.ReadAllBytes(file);
-                            images.Add(new ImageModel
-                            {
-                                Name = Path.GetFileName(file),
-                                Base64 = Convert.ToBase64String(bytes, 0, bytes.Length)
-                            });
-                        }
-                        return new ResponseModel<List<ImageModel>> { data = images, newAccessToken = vu.accessToken };
-                    }
-                    else
-                    {
-                        return StatusCode(403);
-                    }
-                }
-                catch (Exception e)
-                {
-                    return BadRequest(e.Message);
-                }
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
     }
 }
