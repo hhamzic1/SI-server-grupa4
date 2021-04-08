@@ -82,5 +82,36 @@ namespace MonitorWebAPI.Controllers
                 return Unauthorized();
             }
         }
+
+        [Route("api/user/GetAllUsers")]
+        [HttpGet]
+        public async Task<ActionResult<ResponseModel<IQueryable>>> GetAllUsers([FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                var users = mc.Users
+                     .Select(x => new {
+                         x.Name,
+                         x.Lastname,
+                         x.Email,
+                         x.UserId,
+                         x.Phone,
+                         x.Address
+                     });
+                return new ResponseModel<IQueryable>() { data = users, newAccessToken = vu.accessToken };
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
     }
 }

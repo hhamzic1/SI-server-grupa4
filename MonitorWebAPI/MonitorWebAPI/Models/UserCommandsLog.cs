@@ -11,7 +11,7 @@ namespace MonitorWebAPI.Models
         public int UserId { get; set; }
         public int DeviceId { get; set; }
         public string Command { get; set; }
-        public int? Response { get; set; }
+        public string Response { get; set; }
         public DateTime Time { get; set; }
 
         public virtual Device Device { get; set; }
