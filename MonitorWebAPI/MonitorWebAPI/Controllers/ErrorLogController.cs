@@ -29,7 +29,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/error/DateInterval")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<ErrorInfo>>>> GetErrorsInDateInterval([FromBody] ErrorDateInterval errorDateInterval)
+        public async Task<ActionResult<ResponseModel<DeviceErrorInfo>>> GetErrorsInDateInterval([FromBody] ErrorDateInterval errorDateInterval)
         {
             List<ErrorLog> errorLogs = mc.ErrorLogs.Where(x => x.Device.DeviceUid == errorDateInterval.DeviceUID && x.ErrorTime >= errorDateInterval.StartDate && x.ErrorTime <= errorDateInterval.EndDate).ToList();
 
@@ -37,21 +37,83 @@ namespace MonitorWebAPI.Controllers
 
             foreach(var x in errorLogs)
             {
+                if (x.ErrorTypeId == null)
+                {
+                    errorInfos.Add(new ErrorInfo()
+                    {
+                        ErrorTime = x.ErrorTime,
+                        Message = x.Message,
+                        Code = null,
+                        Description = null,
+                        Type = null
+                    });
+                    continue;
+                }
                 ErrorDictionary errorDictionary = mc.ErrorDictionaries.Where(y => y.Id == x.ErrorTypeId).FirstOrDefault();
                 errorInfos.Add(new ErrorInfo() { 
                     ErrorTime = x.ErrorTime,
                     Message = x.Message,
                     Code = errorDictionary.Code,
                     Description = errorDictionary.Description,
-                    Type = errorDictionary.Type,
-                    DeviceUID = errorDateInterval.DeviceUID
+                    Type = errorDictionary.Type
                 });
             }
+            DeviceErrorInfo deviceErrorInfo = new DeviceErrorInfo()
+            {
+                DeviceUID = errorDateInterval.DeviceUID,
+                ErrorNumber = errorLogs.Count,
+                errorInfo = errorInfos
+            };
 
-            return new ResponseModel<List<ErrorInfo>>() { data = errorInfos, newAccessToken = null };
+            return new ResponseModel<DeviceErrorInfo> () { data = deviceErrorInfo, newAccessToken = null };
         }
 
-        //funkcija CheckIfDeviceBelongsToUsersTree
+        [Route("api/error/AllDateInterval")]
+        [HttpGet]
+        public async Task<ActionResult<ResponseModel<List<DeviceErrorInfo>>>> Proba([FromBody] DateInterval dateInterval)
+        {
+            List<DeviceErrorInfo> deviceErrorInfos = new List<DeviceErrorInfo>();
+            List<Device> devices = mc.Devices.ToList();
+            foreach(var device in devices)
+            {
+                List<ErrorLog> errorLogs = mc.ErrorLogs.Where(x => x.Device.DeviceUid == device.DeviceUid && x.ErrorTime >= dateInterval.StartDate && x.ErrorTime <= dateInterval.EndDate).ToList();
+
+                List<ErrorInfo> errorInfos = new List<ErrorInfo>();
+
+                foreach (var x in errorLogs)
+                {
+                    if (x.ErrorTypeId == null)
+                    {
+                        errorInfos.Add(new ErrorInfo()
+                        {
+                            ErrorTime = x.ErrorTime,
+                            Message = x.Message,
+                            Code = null,
+                            Description = null,
+                            Type = null
+                        });
+                        continue;
+                    }
+                    ErrorDictionary errorDictionary = mc.ErrorDictionaries.Where(y => y.Id == x.ErrorTypeId).FirstOrDefault();
+                    errorInfos.Add(new ErrorInfo()
+                    {
+                        ErrorTime = x.ErrorTime,
+                        Message = x.Message,
+                        Code = errorDictionary.Code,
+                        Description = errorDictionary.Description,
+                        Type = errorDictionary.Type
+                    });
+                }
+                deviceErrorInfos.Add(new DeviceErrorInfo()
+                {
+                    DeviceUID = device.DeviceUid,
+                    ErrorNumber = errorLogs.Count,
+                    errorInfo = errorInfos
+                });
+            }
+            return new ResponseModel<List<DeviceErrorInfo>>() { data = deviceErrorInfos, newAccessToken = null };
+        }
+
         [Route("api/error/GroupErrors")]
         [HttpGet]
         public async Task<ActionResult<ResponseModel<List<ErrorInfo>>>> GetErrorsFromOneGroup([FromHeader] string Authorization)
@@ -91,8 +153,7 @@ namespace MonitorWebAPI.Controllers
                             Message = x.Message,
                             Code = null,
                             Description = null,
-                            Type = null,
-                            DeviceUID = guid
+                            Type = null
                         });
                         continue;
                     }
@@ -103,8 +164,7 @@ namespace MonitorWebAPI.Controllers
                         Message = x.Message,
                         Code = errorDictionary.Code,
                         Description = errorDictionary.Description,
-                        Type = errorDictionary.Type,
-                        DeviceUID = guid
+                        Type = errorDictionary.Type
                     });
                 }
 
