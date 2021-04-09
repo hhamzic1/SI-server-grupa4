@@ -9,7 +9,7 @@ namespace MonitorWebAPI.Models
         public string Name { get; set; }
         public string Query { get; set; }
         public string Frequency { get; set; }
-        public DateTime StartDate { get; set; }
+        public DateTime NextDate { get; set; }
         public int UserId { get; set; }
         public ICollection<ReportInstance> ReportInstances { get; set; }
     }

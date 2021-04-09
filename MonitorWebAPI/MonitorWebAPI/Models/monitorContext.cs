@@ -195,6 +195,8 @@ namespace MonitorWebAPI.Models
 
                 entity.Property(e => e.Id).HasDefaultValueSql("nextval('\"report_instances_Id_seq\"'::regclass)");
 
+                entity.Property(e => e.Date).HasColumnType("timestamp with time zone");
+
                 entity.Property(e => e.Name).IsRequired();
 
                 entity.Property(e => e.UriLink)
