@@ -176,7 +176,7 @@ namespace MonitorWebAPI.Helpers
                 
                 if (TimeZoneInfo.ConvertTimeToUtc(rep.NextDate).Equals(dateTime))
                 {
-                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + TimeZoneInfo.ConvertTimeToUtc(rep.NextDate), ReportId = rep.ReportId, UriLink = "ftp://..." });
+                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + TimeZoneInfo.ConvertTimeToUtc(rep.NextDate), ReportId = rep.ReportId, UriLink = "ftp://...", Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
                     if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(7);
