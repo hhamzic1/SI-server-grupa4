@@ -335,6 +335,89 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
+        // GET: api/UserTasks/All
+        [HttpGet("All")]
+        public async Task<ActionResult<ResponseModel<IEnumerable<User>>>> GetAllUserTasks([FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                if (mc.Roles.Find(vu.roleId).Name == "MonitorSuperAdmin")
+                {
+                    var users = await mc.Users.ToListAsync();
+                    foreach (User user in users)
+                    {
+                        user.Password = null;
+                        user.Role = null;
+                        user.UserTasks = await mc.UserTasks.Where(t => t.UserId == user.UserId).ToListAsync();
+                        foreach (UserTask task in user.UserTasks)
+                        {
+                            if (task.DeviceId != null)
+                            {
+                                task.Device = await mc.Devices.FindAsync(task.DeviceId);
+                                task.Device.UserTasks = null;
+                            }
+                        }
+
+                    }
+                    return new ResponseModel<IEnumerable<User>>() { data = users, newAccessToken = vu.accessToken };
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        // GET: api/UserTasks/All
+        [HttpGet("All/{id}")]
+        public async Task<ActionResult<ResponseModel<IEnumerable<UserTask>>>> GetAllUserTasks([FromHeader] string Authorization, [FromRoute] int id)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                if (mc.Roles.Find(vu.roleId).Name == "MonitorSuperAdmin")
+                {
+                    var tasks = await mc.UserTasks.Where(t => t.UserId == id).ToListAsync();
+                    foreach (UserTask task in tasks)
+                    {
+                        if (task.DeviceId != null)
+                        {
+                            task.Device = await mc.Devices.FindAsync(task.DeviceId);
+                            task.Device.UserTasks = null;
+                        }
+                    }
+                    return new ResponseModel<IEnumerable<UserTask>>() { data = tasks, newAccessToken = vu.accessToken };
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
         private bool UserTaskExists(int id)
         {
             return mc.UserTasks.Any(e => e.TaskId == id);
