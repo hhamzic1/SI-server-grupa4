@@ -164,6 +164,19 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
+        public static void sendEmail(String email, String password)
+        {
+            var smptClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("neki naš mail", "neki naš password"),
+                EnableSsl = true
+            };
+
+            smptClient.Send("neki naš mail", email, "subject", "body");
+
+        }
+
         public static void CronJob()
         {
             DateTime now = DateTime.Now;
@@ -176,7 +189,8 @@ namespace MonitorWebAPI.Helpers
                 
                 if (TimeZoneInfo.ConvertTimeToUtc(rep.NextDate).Equals(dateTime))
                 {
-                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + TimeZoneInfo.ConvertTimeToUtc(rep.NextDate), ReportId = rep.ReportId, UriLink = "ftp://...", Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
+                    
+                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " instance", ReportId = rep.ReportId, UriLink = "ftp://...", Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
                     if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(7);
@@ -197,16 +211,13 @@ namespace MonitorWebAPI.Helpers
 
                     mc.SaveChanges();
 
+                    if (rep.SendEmail.Equals(true))
+                    {
+                        var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
+                        
+                        sendEmail(email, "password");
+                    }
                 }
-
-                //var smptClient = new SmtpClient("smtp.gmail.com")
-                //{
-                //    Port = 587,
-                //    Credentials = new NetworkCredential("email", "pass"),
-                //    EnableSsl = true
-                //};
-
-                //smptClient.Send("sender email", "receipement", "subject", "body");
 
             }
 
