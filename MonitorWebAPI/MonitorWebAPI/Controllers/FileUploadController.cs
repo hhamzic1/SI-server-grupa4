@@ -78,7 +78,7 @@ namespace MonitorWebAPI.Controllers
 
 
         [Route("api/upload/GetFile")]
-        [HttpGet]
+        [HttpPost]
         public async Task<ActionResult<ResponseModel<List<ImageResponseModel>>>> GetFileFromFolder([FromBody] ImageRequestModel ids, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
