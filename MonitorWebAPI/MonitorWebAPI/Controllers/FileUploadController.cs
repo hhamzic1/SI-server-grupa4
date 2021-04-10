@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 using MonitorWebAPI.Helpers;
 using MonitorWebAPI.Models;
-
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MonitorWebAPI.Controllers
 {
@@ -74,6 +75,90 @@ namespace MonitorWebAPI.Controllers
                 return Unauthorized();
             }
         }
+
+
+        [Route("api/upload/GetFile")]
+        [HttpPost]
+        public async Task<ActionResult<ResponseModel<List<ImageResponseModel>>>> GetFileFromFolder([FromBody] ImageRequestModel ids, [FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                try
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+
+                    List<ImageResponseModel> images = new List<ImageResponseModel>();
+
+
+                    var folderName = Path.Combine("Uploads", "Files");
+                    var path = Path.Combine(hostingEnvironment.ContentRootPath, folderName);
+
+
+                    foreach (string file in Directory.GetFiles(path,ids.machineUid+"-"+ids.taskId+"*"))
+                    {
+                        
+                        byte[] bytes = System.IO.File.ReadAllBytes(file);
+
+                        
+                        images.Add(new ImageResponseModel
+                        {
+                            Name = Path.GetFileName(file),
+                            Data = Convert.ToBase64String(bytes, 0, bytes.Length)
+                        });
+                    }
+
+
+                    return new ResponseModel<List<ImageResponseModel>>() { data = images, newAccessToken = vu.accessToken };
+                }
+                catch (Exception e)
+                {
+                    return StatusCode(500, e.Message);
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [Route("api/upload/GetFileTest")]
+        [HttpGet]
+        public async Task<ActionResult<ResponseModel<List<String>>>> GetFileTest()
+        {
+                try
+                {
+                    
+                    List<String> images = new List<String>();
+
+
+                    var folderName = Path.Combine("Uploads", "Files");
+                    var path = Path.Combine(hostingEnvironment.ContentRootPath, folderName);
+
+
+                    foreach (string file in Directory.GetFiles(path))
+                    { 
+
+                        images.Add(file);
+                    }
+
+
+                    return new ResponseModel<List<String>>() { data = images, newAccessToken = "123" };
+                }
+                catch (Exception e)
+                {
+                    return StatusCode(500, e.Message);
+                }
+        }
+           
+        
+
         /*
         [Route("api/upload/UploadFileByteArray")]
         [HttpPost]

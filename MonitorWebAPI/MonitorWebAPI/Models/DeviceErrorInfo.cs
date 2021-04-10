@@ -10,5 +10,6 @@ namespace MonitorWebAPI.Models
         public Guid DeviceUID { get; set; }
         public int ErrorNumber { get; set; }
         public List<ErrorInfo> errorInfo { get; set; }
+        public List<ErrorTypeInfo> errorTypeInfos { get; set;}
     }
 }
