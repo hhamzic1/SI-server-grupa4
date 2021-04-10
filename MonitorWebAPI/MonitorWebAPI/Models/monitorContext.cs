@@ -203,11 +203,11 @@ namespace MonitorWebAPI.Models
                     .IsRequired()
                     .HasColumnName("URI_link");
 
-                entity.HasOne(d => d.Report)
-                    .WithMany(p => p.ReportInstances)
-                    .HasForeignKey(d => d.ReportId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("report_instances_reports_reportid_fk");
+                //entity.HasOne(d => d.Report)
+                //    .WithMany(p => p.ReportInstances)
+                //    .HasForeignKey(d => d.ReportId)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("report_instances_reports_reportid_fk");
             });
 
             modelBuilder.Entity<Role>(entity =>

@@ -13,6 +13,6 @@ namespace MonitorWebAPI.Models
         public string UriLink { get; set; }
         public DateTime? Date { get; set; }
 
-        public virtual Report Report { get; set; }
+        //public virtual Report Report { get; set; }
     }
 }
