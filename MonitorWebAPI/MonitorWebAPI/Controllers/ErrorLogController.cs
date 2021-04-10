@@ -29,10 +29,13 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/error/DateInterval")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<DeviceErrorInfo>>> GetErrorsInDateInterval([FromBody] ErrorDateInterval errorDateInterval)
+        public async Task<ActionResult<ResponseModel<DeviceErrorInfo>>> GetErrorsInDateInterval([FromQuery] String DeviceUID, [FromQuery] String? StartDate, [FromQuery] String? EndDate)
         {
-            List<ErrorLog> errorLogs = mc.ErrorLogs.Where(x => x.Device.DeviceUid == errorDateInterval.DeviceUID && x.ErrorTime >= errorDateInterval.StartDate && x.ErrorTime <= errorDateInterval.EndDate).ToList();
+            DateTime StartDateParsed = StartDate != null ? DateTime.Parse(StartDate) : DateTime.Now.AddYears(-1500);
+            DateTime EndDateParsed = EndDate != null ? DateTime.Parse(EndDate) : DateTime.Now;
 
+            List<ErrorLog> errorLogs = mc.ErrorLogs.Where(x => x.Device.DeviceUid == Guid.Parse(DeviceUID) && x.ErrorTime >= StartDateParsed && x.ErrorTime <= EndDateParsed).ToList();
+            int deviceId = mc.Devices.Where(x => x.DeviceUid == Guid.Parse(DeviceUID)).FirstOrDefault().DeviceId;
             List<ErrorInfo> errorInfos = new List<ErrorInfo>();
 
             foreach(var x in errorLogs)
@@ -50,6 +53,8 @@ namespace MonitorWebAPI.Controllers
                     continue;
                 }
                 ErrorDictionary errorDictionary = mc.ErrorDictionaries.Where(y => y.Id == x.ErrorTypeId).FirstOrDefault();
+                
+
                 errorInfos.Add(new ErrorInfo() { 
                     ErrorTime = x.ErrorTime,
                     Message = x.Message,
@@ -58,11 +63,38 @@ namespace MonitorWebAPI.Controllers
                     Type = errorDictionary.Type
                 });
             }
+
+            List<int?> types = new List<int?>();
+            foreach (var temp in errorLogs) types.Add(temp.ErrorTypeId);
+            types = types.Distinct().ToList();
+            List<ErrorTypeInfo> errorTypeInfos = new List<ErrorTypeInfo>();
+            foreach( var type in types)
+            {
+                int? tempCode = null;
+                if(type != null)
+                {
+                    tempCode = mc.ErrorDictionaries.Where(x => x.Id == type).FirstOrDefault().Code;
+                }
+
+                int tempErrorCodeNumber = errorLogs.Where(x => x.ErrorTypeId == type).Count();
+
+
+                errorTypeInfos.Add(new ErrorTypeInfo() {
+
+                    Code = tempCode,
+                    ErrorCodeNumber = tempErrorCodeNumber
+                });
+            }
+           
+
+
+
             DeviceErrorInfo deviceErrorInfo = new DeviceErrorInfo()
             {
-                DeviceUID = errorDateInterval.DeviceUID,
+                DeviceUID = Guid.Parse(DeviceUID),
                 ErrorNumber = errorLogs.Count,
-                errorInfo = errorInfos
+                errorInfo = errorInfos,
+                errorTypeInfos = errorTypeInfos
             };
 
             return new ResponseModel<DeviceErrorInfo> () { data = deviceErrorInfo, newAccessToken = null };
@@ -70,13 +102,17 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/error/AllDateInterval")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<DeviceErrorInfo>>>> Proba([FromBody] DateInterval dateInterval)
+        public async Task<ActionResult<ResponseModel<List<DeviceErrorInfo>>>> Proba([FromQuery] String? StartDate, [FromQuery] String? EndDate)
         {
+            DateTime StartDateParsed = StartDate != null ? DateTime.Parse(StartDate) : DateTime.Now.AddYears(-1500);
+            DateTime EndDateParsed = EndDate != null ? DateTime.Parse(EndDate) : DateTime.Now;
+
+
             List<DeviceErrorInfo> deviceErrorInfos = new List<DeviceErrorInfo>();
             List<Device> devices = mc.Devices.ToList();
             foreach(var device in devices)
             {
-                List<ErrorLog> errorLogs = mc.ErrorLogs.Where(x => x.Device.DeviceUid == device.DeviceUid && x.ErrorTime >= dateInterval.StartDate && x.ErrorTime <= dateInterval.EndDate).ToList();
+                List<ErrorLog> errorLogs = mc.ErrorLogs.Where(x => x.Device.DeviceUid == device.DeviceUid && x.ErrorTime >= StartDateParsed && x.ErrorTime <= EndDateParsed).ToList();
 
                 List<ErrorInfo> errorInfos = new List<ErrorInfo>();
 
@@ -104,11 +140,38 @@ namespace MonitorWebAPI.Controllers
                         Type = errorDictionary.Type
                     });
                 }
+
+
+                List<int?> types = new List<int?>();
+                foreach (var temp in errorLogs) types.Add(temp.ErrorTypeId);
+                types = types.Distinct().ToList();
+                List<ErrorTypeInfo> errorTypeInfos = new List<ErrorTypeInfo>();
+                foreach (var type in types)
+                {
+                    int? tempCode = null;
+                    if (type != null)
+                    {
+                        tempCode = mc.ErrorDictionaries.Where(x => x.Id == type).FirstOrDefault().Code;
+                    }
+
+                    int tempErrorCodeNumber = errorLogs.Where(x => x.ErrorTypeId == type).Count();
+
+
+                    errorTypeInfos.Add(new ErrorTypeInfo()
+                    {
+
+                        Code = tempCode,
+                        ErrorCodeNumber = tempErrorCodeNumber
+                    });
+                }
+
+
                 deviceErrorInfos.Add(new DeviceErrorInfo()
                 {
                     DeviceUID = device.DeviceUid,
                     ErrorNumber = errorLogs.Count,
-                    errorInfo = errorInfos
+                    errorInfo = errorInfos,
+                    errorTypeInfos = errorTypeInfos
                 });
             }
             return new ResponseModel<List<DeviceErrorInfo>>() { data = deviceErrorInfos, newAccessToken = null };
