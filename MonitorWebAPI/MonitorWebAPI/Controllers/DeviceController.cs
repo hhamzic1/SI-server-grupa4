@@ -283,7 +283,7 @@ namespace MonitorWebAPI.Controllers
                 }
                 else if (userRoleName == SUPER_ADMIN)
                 {
-                    Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
+                    Models.Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
 
                     GroupHierarchyModel ghm = hm.FindHierarchyTreeWithDevices(g);
                     List<Device> myDevices = hm.GetDevicesForGHM(ghm);
@@ -332,7 +332,7 @@ namespace MonitorWebAPI.Controllers
                 {
                     if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId)))
                     {
-                        Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+                        Models.Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
                         if (g == null)
                         {
                             return NotFound();

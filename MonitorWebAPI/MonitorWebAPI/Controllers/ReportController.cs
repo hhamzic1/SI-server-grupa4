@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MonitorWebAPI.Controllers
 {
@@ -332,5 +334,21 @@ namespace MonitorWebAPI.Controllers
                 return Unauthorized();
             }
         }
+
+
+        [Route("api/report/GetReportInstancesAdnanTest")]
+        [HttpGet]
+        public string GetReportInstancesAdnanTest([FromHeader] string Authorization, [FromBody] string query)
+        {
+            QueryModel x = System.Text.Json.JsonSerializer.Deserialize<QueryModel>(query);
+            x.GenerateQuery();
+
+            Device d = new Device();
+            d.LocationLongitude = 5;
+            d.LocationLatitude = 5;
+
+            return x.query.Eval(d).ToString() + "\n" + x.select.Aggregate((x, y) => x.ToString() + " " + y.ToString()) + "\n" + x.group.ToString() + "\n" + x.freq;
+        }
+
     }
 }
