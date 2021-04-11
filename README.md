@@ -14,12 +14,12 @@ Potrebno je skinuti projekat sa github repozitorija i otvoriti ga pomoću Visual
 Sprint 1:
 
     • Kao korisnik-administrator želim da imam mogućnost kreiranja i pregledanja mašina koje se servisiraju
-    • Kao obični korisnik želim da se omogući pregledanje statusa mašina iz moje grupe
+    • Kao korisnik želim da se omogući pregledanje statusa mašina iz moje grupe
     
 Sprint 2:
 
-    • Kao obični korisnik želim da se omogući pretraga mašina po nazivu, statusu
-    • Kao obični korisnik želim da se omogući paginacija mašina koje mi pripadaju i da se omogući sortiranje istih po nazivu, statusu i lokaciji
+    • Kao korisnik želim da se omogući pretraga mašina po nazivu, statusu
+    • Kao korisnik želim da se omogući paginacija mašina koje mi pripadaju i da se omogući sortiranje istih po nazivu, statusu i lokaciji
     Dodatni feature:
         • Omogućeno web/mobile aplikaciji hijerarhijski prikaz grupa, kao i dobavljanje svih uređaja koji pripadaju trenutno logovanom korisniku. Nad tim
         uređajima je moguće raditi gore navedene zahtjeve
@@ -31,6 +31,12 @@ Sprint 3:
     • Kao korisnik želim da se omogući pregleda da li je mašina pod mojom ovlasti
     • Kao korisnik želim da se omogući pregled mašine po njenom instalacijskom kodu prvi put nakon čega taj instalacijski kod ističe i ne može se više koristiti
 
+Sprint 4:
+
+    * Kao korisnik želim da se omogući ažuriranje podataka o mašini
+    * Kao korisnik želim da se omogući spašavanje historije mojih komandnih loggova u bazu
+    * Kao korisnik želim da se omogući pregled mojih loggova na određenoj mašini
+    * Kao korisnik želim da se omogući pregled loggova određenog korisnika na određenoj mašini
 
 ## Rute za zahtjeve
 
@@ -48,6 +54,18 @@ Sprint 3:
   
   * Vraća dodatne informacije o loggovanom korisniku
 
+* [Route("api/user/GetAllUsers")]
+
+  [HttpGet]
+  
+  * Vraća osnovne informacije o svim korisnicima
+
+* [Route("api/user/All")]
+
+  [HttpGet]
+  
+  * Vraća lozinku i rolu svih korisnika
+
 ### Rute za uređaje
 
 * [Route("api/device/AllDevices")]
@@ -55,6 +73,12 @@ Sprint 3:
   [HttpGet]
 
   * Vraća sve uređaje koji su dostupni tom korisniku u zavisnosti od njegove role i grupe
+
+* [Route("api/device/AllDevicesForUser")]
+
+  [HttpGet]
+
+  * Vraća sve uređaje koji su dostupni tom korisniku u zavisnosti od njegove role i grupe uz omogucenu paginaciju
 
 * [Route("api/device/CreateDevice")]
 
@@ -93,6 +117,12 @@ Sprint 3:
   
   * Vraća sve logove mašine za sve mašine kojim logovani korisnik ima pristup
 
+* [Route("api/device/{groupId}")] 
+
+  [HttpPut]
+  
+  * Omogućava ažuriranje mašine ukoliko se ona nalazi pod ovlasti trenutno loggovanog korisnika
+
 ### Rute za file upload
 
 * [Route("api/upload/UploadFile")]
@@ -127,6 +157,32 @@ Sprint 3:
   
   * Omogućuje kreiranje nove grupe ukoliko je korisnik MonitorSuperAdmin ili ukoliko je nova grupa koja se dodaje podgrupa grupe kojoj je trenutni korisnik
     SuperAdmin
+    
+* [Route("/api/group/{groupId}")]
+
+  [HttpPut]
+  
+  * Omogućuje ažuriranje id-a grupe ukoliko trenutni korisnik ima pravo na to
+
+### Rute za komandne loggove korisnika
+
+* [Route("/api/user-comand-logs")]
+
+  [HttpPost]
+  
+  * Dodaje novi komandni log za trenutno loggovanog korisnika ukoliko korisnik ima odgovarajuću rolu
+
+* [Route("/api/user-comand-logs/CommandLogsForDevice")]
+
+  [HttpGet]
+  
+  * Omogućuje pregled komandnih loggova za određenu mašinu
+
+* [Route("/api/user-comand-logs/CommandLogsForDeviceAndUser")]
+
+  [HttpGet]
+  
+  * Omogućuje pregled komandnih loggova određenog korisnika za određenu mašinu
 
 ### Rute za izvještaj
 
@@ -142,7 +198,7 @@ Sprint 3:
 
   [HttpGet]
   
-  * Daje sve role 
+  * Vraća sve role 
 
 Za dodatne informacije o rutama posjetite: https://si-2021.167.99.244.168.nip.io/swagger/index.html
 
