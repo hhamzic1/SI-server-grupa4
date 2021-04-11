@@ -240,6 +240,32 @@ namespace MonitorWebAPI.Helpers
             return await client.PostAsync("https://si-grupa5.herokuapp.com/api/web/agent/file/put", data);
         }
 
+        public static DateTime GetStartDate(DateTime endDate, string frequency)
+        {
+            DateTime startDate = new DateTime();
+
+            if (frequency.ToUpper().Equals("DAILY"))
+            {
+                startDate = endDate.AddDays(-1);
+            }
+            else if (frequency.ToUpper().Equals("WEEKLY"))
+            {
+                startDate = endDate.AddDays(-7);
+            }
+            else if (frequency.ToUpper().Equals("MONTHLY"))
+            {
+                startDate = endDate.AddMonths(-1);
+            }
+            else if (frequency.ToUpper().Equals("YEARLY"))
+            {
+                startDate = endDate.AddYears(-1);
+            }
+
+            return startDate;
+        } 
+
+        
+
 
     }
 }
