@@ -53,7 +53,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        ReportInstances = report.ReportInstances,
+                        ReportInstances = mc.ReportInstances.Where(x => x.ReportId == report.ReportId).ToList(),
                         NextDate = report.NextDate,
                         UserId = vu.id
                     });
@@ -119,7 +119,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        ReportInstances = report.ReportInstances,
+                        ReportInstances = mc.ReportInstances.Where(x => x.ReportId == report.ReportId).ToList(),
                         NextDate = report.NextDate,
                         UserId = vu.id
                     });
@@ -159,7 +159,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        ReportInstances = report.ReportInstances,
+                        ReportInstances = mc.ReportInstances.Where(x => x.ReportId == report.ReportId).ToList(),
                         NextDate = report.NextDate,
                         UserId = vu.id
                     };
@@ -219,7 +219,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        ReportInstances = report.ReportInstances,
+                        ReportInstances = mc.ReportInstances.Where(x => x.ReportId == report.ReportId).ToList(),
                         NextDate = report.NextDate,
                         UserId = vu.id,
                     });
@@ -264,7 +264,7 @@ namespace MonitorWebAPI.Controllers
                         Name = report.Name,
                         Query = report.Query,
                         Frequency = report.Frequency,
-                        ReportInstances = report.ReportInstances,
+                        ReportInstances = mc.ReportInstances.Where(x => x.ReportId == report.ReportId).ToList(),
                         NextDate = report.NextDate,
                         UserId = vu.id
                     });
