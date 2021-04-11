@@ -164,7 +164,7 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
-        public static void sendEmail(String email, String password)
+        public static void sendEmail(int id, String email)
         {
             var smptClient = new SmtpClient("smtp.gmail.com")
             {
@@ -172,6 +172,10 @@ namespace MonitorWebAPI.Helpers
                 Credentials = new NetworkCredential("neki naš mail", "neki naš password"),
                 EnableSsl = true
             };
+
+            var pdf = createPDF(id);
+
+            upload(pdf)
 
             smptClient.Send("neki naš mail", email, "subject", "body");
 
@@ -214,8 +218,8 @@ namespace MonitorWebAPI.Helpers
                     if (rep.SendEmail.Equals(true))
                     {
                         var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
-                        
-                        sendEmail(email, "password");
+
+                        sendEmail(rep.ReportId, email);
                     }
                 }
 
