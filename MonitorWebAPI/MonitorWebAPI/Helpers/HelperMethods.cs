@@ -1,4 +1,5 @@
-﻿using MonitorWebAPI.Models;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using MonitorWebAPI.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -240,6 +241,41 @@ namespace MonitorWebAPI.Helpers
             return await client.PostAsync("https://si-grupa5.herokuapp.com/api/web/agent/file/put", data);
         }
 
+
+        public bool CheckBaseGroup(int? groupId1, int? groupId2)
+        {
+            monitorContext mc = new monitorContext();
+            Group group1 = mc.Groups.Where(x => x.GroupId == groupId1).FirstOrDefault();
+            Group group2 = mc.Groups.Where(x => x.GroupId == groupId2).FirstOrDefault();
+
+            while(true)
+            {
+                Group parentGroup1 = mc.Groups.Where(x => x.GroupId == group1.ParentGroup).FirstOrDefault();
+                if(parentGroup1.ParentGroup == null)
+                {
+                    break;
+                }
+                group1 = mc.Groups.Where(x => x.GroupId == group1.ParentGroup).FirstOrDefault();
+            }
+
+            while (true)
+            {
+                Group parentGroup2 = mc.Groups.Where(x => x.GroupId == group2.ParentGroup).FirstOrDefault();
+                if (parentGroup2.ParentGroup == null)
+                {
+                    break;
+                }
+                group2 = mc.Groups.Where(x => x.GroupId == group2.ParentGroup).FirstOrDefault();
+            }
+
+            if (group1.Equals(group2))
+            {
+                return true;
+            }
+
+            return false;
+        
+        }
 
     }
 }

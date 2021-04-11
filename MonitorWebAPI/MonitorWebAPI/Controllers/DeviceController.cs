@@ -513,9 +513,15 @@ namespace MonitorWebAPI.Controllers
                             if (groups == 0)
                             {
                                 DeviceGroup tempDeviceGroup = mc.DeviceGroups.Where(x => x.DeviceId == device.DeviceId).FirstOrDefault();
-                                mc.Attach(tempDeviceGroup);
-                                tempDeviceGroup.GroupId = groupId;
-                                mc.SaveChanges();
+                                
+                                if(helperMethod.CheckBaseGroup(groupId, tempDeviceGroup.GroupId))
+                                {   
+                                    mc.Attach(tempDeviceGroup);
+                                    tempDeviceGroup.GroupId = groupId;
+                                    mc.SaveChanges();
+                                }
+
+                                
                             }
                         }
                         HttpResponseMessage configFileResponse = HelperMethods.GetConfigFile(JWT, newDevice.DeviceUid, "config.json", username).Result;
