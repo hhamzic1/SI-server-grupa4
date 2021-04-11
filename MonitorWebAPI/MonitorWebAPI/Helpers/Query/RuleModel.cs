@@ -25,10 +25,10 @@ namespace MonitorWebAPI.Helpers
             {
                 case "=": return field_value.Equals(value);
                 case "!=": return !(field_value.Equals(value));
-                case "<=": return Int64.Parse(field_value) <= Int64.Parse(value);
-                case ">=": return Int64.Parse(field_value) >= Int64.Parse(value);
-                case "<": return Int64.Parse(field_value) < Int64.Parse(value);
-                case ">": return Int64.Parse(field_value) > Int64.Parse(value);
+                case "<=": return Double.Parse(field_value) <= Double.Parse(value);
+                case ">=": return Double.Parse(field_value) >= Double.Parse(value);
+                case "<": return Double.Parse(field_value) < Double.Parse(value);
+                case ">": return Double.Parse(field_value) > Double.Parse(value);
                 case "contains": return field_value.Contains(value);
                 case "beginsWith": return field_value.StartsWith(value);
                 case "endsWith": return field_value.EndsWith(value);
