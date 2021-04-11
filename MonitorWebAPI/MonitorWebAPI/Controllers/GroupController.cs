@@ -27,7 +27,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/group/MyGroup")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<Group>>> MyGroup([FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<Models.Group>>> MyGroup([FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -39,7 +39,7 @@ namespace MonitorWebAPI.Controllers
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                return new ResponseModel<Group>() { data = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault(), newAccessToken = vu.accessToken };
+                return new ResponseModel<Models.Group>() { data = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault(), newAccessToken = vu.accessToken };
             }
             else
             {
@@ -64,7 +64,7 @@ namespace MonitorWebAPI.Controllers
                     var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                     if (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, vu.groupId))
                     {
-                        Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
+                    Models.Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
                         GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
                         return new ResponseModel<GroupHierarchyModel>() { data = ghm, newAccessToken = vu.accessToken };
                     }
@@ -98,7 +98,7 @@ namespace MonitorWebAPI.Controllers
                 {
                     if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId)))
                     {
-                        Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+                        Models.Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
                         GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
                         return new ResponseModel<GroupHierarchyModel>() { data = ghm, newAccessToken = vu.accessToken };
                     }
@@ -120,7 +120,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("/api/group/CreateGroup")]
         [HttpPost]
-        public async Task<ActionResult<ResponseModel<Group>>> CreateGroup([FromHeader] string Authorization, [FromBody] Group group)
+        public async Task<ActionResult<ResponseModel<Models.Group>>> CreateGroup([FromHeader] string Authorization, [FromBody] Models.Group group)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -141,7 +141,7 @@ namespace MonitorWebAPI.Controllers
                         await mc.SaveChangesAsync();
                         int id = group.GroupId;
 
-                        Group tempGroup = mc.Groups.Where(x => x.GroupId == id).FirstOrDefault();
+                        Models.Group tempGroup = mc.Groups.Where(x => x.GroupId == id).FirstOrDefault();
                         if (tempGroup != null)
                         {
                             var deviceGroups = mc.DeviceGroups.Where(x => x.GroupId == tempGroup.ParentGroup).ToList();
@@ -151,7 +151,7 @@ namespace MonitorWebAPI.Controllers
                                 mc.DeviceGroups.Attach(temp).Property(y => y.GroupId).IsModified = true;
                                 mc.SaveChanges();
                             }
-                            return new ResponseModel<Group>() { data = tempGroup, newAccessToken = vu.accessToken };
+                            return new ResponseModel<Models.Group>() { data = tempGroup, newAccessToken = vu.accessToken };
                         }
                         throw new Exception("Group wasn't added succesfully");
                     }
@@ -172,7 +172,7 @@ namespace MonitorWebAPI.Controllers
         }
 
         [HttpPut("/api/group/{groupId}")]
-        public async Task<ActionResult<ResponseModel<Group>>> PutGroup(int groupId, [FromBody] Group newGroup, [FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<Models.Group>>> PutGroup(int groupId, [FromBody] Models.Group newGroup, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -189,7 +189,7 @@ namespace MonitorWebAPI.Controllers
                     var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                     if (userRoleName == "MonitorSuperAdmin" || (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId)))
                     {
-                        Group group = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+                        Models.Group group = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
                         if (group == null)
                         {
                             throw new Exception("Group with that id doesn't exist");
@@ -197,7 +197,7 @@ namespace MonitorWebAPI.Controllers
                         mc.Groups.Attach(group);
                         group.Name = newGroup.Name;
                         mc.SaveChanges();
-                        return new ResponseModel<Group>() { data = group, newAccessToken = vu.accessToken };
+                        return new ResponseModel<Models.Group>() { data = group, newAccessToken = vu.accessToken };
                     }
                     else
                     {

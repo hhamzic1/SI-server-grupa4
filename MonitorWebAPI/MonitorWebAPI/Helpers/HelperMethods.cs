@@ -15,7 +15,7 @@ namespace MonitorWebAPI.Helpers
     public class HelperMethods
     {
 
-        public GroupHierarchyModel FindHierarchyTree(Group g)
+        public GroupHierarchyModel FindHierarchyTree(Models.Group g)
         {
             monitorContext mc = new monitorContext();
             GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = g.GroupId, Name = g.Name, SubGroups = new List<GroupHierarchyModel>() };
@@ -36,7 +36,7 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
-        public GroupHierarchyModel FindHierarchyTreeWithDevices(Group g)
+        public GroupHierarchyModel FindHierarchyTreeWithDevices(Models.Group g)
         {
             monitorContext mc = new monitorContext();
             GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = g.GroupId, Name = g.Name, SubGroups = new List<GroupHierarchyModel>() };
@@ -108,7 +108,7 @@ namespace MonitorWebAPI.Helpers
             monitorContext mc = new monitorContext();
             string groupName = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault().Name;
 
-            Group tempGroup  = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+            Models.Group tempGroup  = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
             if (tempGroup == null)
             {
                 throw new NullReferenceException("Group with that id doesn't exist!");
