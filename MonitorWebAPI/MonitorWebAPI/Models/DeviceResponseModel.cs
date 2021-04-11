@@ -14,6 +14,7 @@ namespace MonitorWebAPI.Models
         public int? GroupId { get; set; }
         public string InstallationCode { get; set; }
         public Guid DeviceUid { get; set; }
+        public String GroupName { get; set; }
 
     }
 }

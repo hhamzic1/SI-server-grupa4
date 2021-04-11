@@ -31,7 +31,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/device/AllDevices")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<Device>>>> GetAllDevices([FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<DevicePagingModel>>> AllDevicesForUser([FromQuery] int? page, [FromQuery] int? per_page, [FromQuery] string? name, [FromQuery] string? status, [FromQuery] int? groupId, string? sort_by, [FromQuery] string? location, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -41,78 +41,130 @@ namespace MonitorWebAPI.Controllers
             HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
             if (response.IsSuccessStatusCode)
             {
-                string responseBody = await response.Content.ReadAsStringAsync();
-                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
-                if (userRoleName == "MonitorSuperAdmin")
+                try
                 {
-
-                    return new ResponseModel<List<Device>>() { data = mc.Devices.ToList(), newAccessToken = vu.accessToken };
-                }
-                else
-                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                    var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                     List<Device> allDevices = mc.Devices.ToList();
-                    HelperMethods hm = new HelperMethods();
-                    List<DeviceResponseModel> myDevicesResponseModelList = new List<DeviceResponseModel>();
-                    List<DeviceResponseModel> drmList = new List<DeviceResponseModel>();
-                    List<int> subgroups = new List<int>();
-                    List<int> nonSubgroups = new List<int>();
-
-
-
-                    foreach (var dev in allDevices)
+                    List<DeviceResponseModel> filteredList = new List<DeviceResponseModel>();
+                    if (userRoleName == "MonitorSuperAdmin")
                     {
-                        drmList.Add(new DeviceResponseModel()
+                        if (groupId == null)
                         {
-                            DeviceId = dev.DeviceId,
-                            Name = dev.Name,
-                            Location = dev.Location,
-                            LocationLatitude = dev.LocationLatitude,
-                            LocationLongitude = dev.LocationLongitude,
-                            Status = dev.Status,
-                            LastTimeOnline = dev.LastTimeOnline,
-                            InstallationCode = dev.InstallationCode,
-                            GroupId = (from x in mc.DeviceGroups.OfType<DeviceGroup>() where x.DeviceId == dev.DeviceId select x.GroupId).FirstOrDefault()
-                        });
-                    }
-
-                    foreach (DeviceResponseModel dev in drmList)
-                    {
-                        try
-                        {
-                            if (subgroups.Contains((int)dev.GroupId))
-                            {
-                                myDevicesResponseModelList.Add(dev);
-                                continue;
-                            }
-                            if (nonSubgroups.Contains((int)dev.GroupId))
-                            {
-                                continue;
-                            }
-                            if (hm.CheckIfDeviceBelongsToUsersTree(vu, dev.DeviceId))
-                            {
-                                subgroups.Add((int)dev.GroupId);
-                                myDevicesResponseModelList.Add(dev);
-                            }
-                            else
-                            {
-                                nonSubgroups.Add(((int)dev.GroupId));
-                            }
+                            filteredList = helperMethod.getDRMfromDeviceList(allDevices, mc);
                         }
-                        catch (Exception e)
+                        else
                         {
-                            return BadRequest(e.Message);
+                            Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+                            GroupHierarchyModel ghm = helperMethod.FindHierarchyTreeWithDevices(g);
+                            List<Device> allDevicesFromGroup = ghm.Devices.ToList();
+                            filteredList = helperMethod.getDRMfromDeviceList(allDevicesFromGroup, mc);
                         }
-
                     }
-                    List<Device> myDevices = new List<Device>();
-
-                    foreach (DeviceResponseModel dev in myDevicesResponseModelList)
+                    else
                     {
-                        myDevices.Add(mc.Devices.Where(x => x.DeviceId == dev.DeviceId).FirstOrDefault());
-                    }
+                        if (groupId != null && helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId))
+                        {
+                            Group g = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+                            GroupHierarchyModel ghm = helperMethod.FindHierarchyTreeWithDevices(g);
+                            List<Device> allDevicesFromGroup = ghm.Devices.ToList();
+                            filteredList = helperMethod.getDRMfromDeviceList(allDevicesFromGroup, mc);
+                        }
+                        else if (groupId != null && !helperMethod.CheckIfGroupBelongsToUsersTree(vu, groupId))
+                        {
+                            return StatusCode(403);
+                        }
+                        else if (groupId == null)
+                        {
+                            List<DeviceResponseModel> myDevicesResponseModelList = new List<DeviceResponseModel>();
+                            List<int> subgroups = new List<int>();
+                            List<int> nonSubgroups = new List<int>();
+                            List<DeviceResponseModel> drmList = helperMethod.getDRMfromDeviceList(allDevices, mc);
+                            foreach (DeviceResponseModel dev in drmList)
+                            {
+                                try
+                                {
+                                    if (subgroups.Contains((int)dev.GroupId))
+                                    {
+                                        myDevicesResponseModelList.Add(dev);
+                                        continue;
+                                    }
+                                    if (nonSubgroups.Contains((int)dev.GroupId))
+                                    {
+                                        continue;
+                                    }
+                                    if (helperMethod.CheckIfDeviceBelongsToUsersTree(vu, dev.DeviceId))
+                                    {
+                                        subgroups.Add((int)dev.GroupId);
+                                        myDevicesResponseModelList.Add(dev);
+                                    }
+                                    else
+                                    {
+                                        nonSubgroups.Add(((int)dev.GroupId));
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    return BadRequest(e.Message);
+                                }
+                            }
 
-                    return new ResponseModel<List<Device>>() { data = myDevices, newAccessToken = vu.accessToken };
+                            filteredList = myDevicesResponseModelList;
+                        }
+                    }
+                    int parsedPage = (page == null || page <= 0) ? 1 : (int)page;
+                    int parsedPerPage = (per_page == null || per_page <= 0) ? 10 : (int)per_page;
+                    string parsedName = name == null ? "" : name;
+                    string parsedLocation = location == null ? "" : location;
+                    string parsedSortBy = sort_by == null ? "" : sort_by;
+                    int skip = (parsedPage - 1) * parsedPerPage;
+                    bool onlineStatus = true;
+                    if (status == "active") onlineStatus = true;
+                    else if (status == "notactive") onlineStatus = false;
+                    filteredList = filteredList.FindAll(s => s.Status == onlineStatus).ToList();
+                    if (name != null || location != null)
+                    {
+                        filteredList = filteredList
+                       .FindAll(x => (name != null && x.Name.Contains(parsedName, StringComparison.InvariantCultureIgnoreCase)) || (location != null && x.Location.Contains(parsedLocation, StringComparison.InvariantCultureIgnoreCase))).ToList();
+                    }
+                    switch (parsedSortBy)
+                    {
+                        case "name_asc":
+                            filteredList = filteredList.OrderBy(x => x.Name).ToList();
+                            break;
+                        case "name_desc":
+                            filteredList = filteredList.OrderByDescending(x => x.Name).ToList();
+                            break;
+                        case "location_asc":
+                            filteredList = filteredList.OrderBy(x => x.Location).ToList();
+                            break;
+                        case "location_desc":
+                            filteredList = filteredList.OrderByDescending(x => x.Location).ToList();
+                            break;
+                        case "status_asc":
+                            filteredList = filteredList.OrderBy(x => x.Status).ToList();
+                            break;
+                        case "status_desc":
+                            filteredList = filteredList.OrderByDescending(x => x.Status).ToList();
+                            break;
+                        case "LastTimeOnline_asc":
+                            filteredList = filteredList.OrderBy(x => x.LastTimeOnline).ToList();
+                            break;
+                        case "LastTimeOnline_desc":
+                            filteredList = filteredList.OrderByDescending(x => x.LastTimeOnline).ToList();
+                            break;
+                        default:
+                            filteredList = filteredList.OrderBy(x => x.DeviceId).ToList();
+                            break;
+                    }
+                    int deviceCount = filteredList.Count;
+                    filteredList = filteredList.Skip(skip).Take(parsedPerPage).ToList();
+                    return new ResponseModel<DevicePagingModel>() { data = new DevicePagingModel() { Devices = filteredList, DeviceCount = deviceCount }, newAccessToken = vu.accessToken };
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(e.Message);
                 }
             }
             else
@@ -339,25 +391,7 @@ namespace MonitorWebAPI.Controllers
                         }
                         GroupHierarchyModel ghm = helperMethod.FindHierarchyTreeWithDevices(g);
                         List<Device> allDevices = ghm.Devices.ToList();
-
-                        List<DeviceResponseModel> drmList = new List<DeviceResponseModel>();
-                        foreach (var dev in allDevices)
-                        {
-                            drmList.Add(new DeviceResponseModel()
-                            {
-                                DeviceId = dev.DeviceId,
-                                Name = dev.Name,
-                                Location = dev.Location,
-                                LocationLatitude = dev.LocationLatitude,
-                                LocationLongitude = dev.LocationLongitude,
-                                Status = dev.Status,
-                                LastTimeOnline = dev.LastTimeOnline,
-                                InstallationCode = dev.InstallationCode,
-                                GroupId = (from x in mc.DeviceGroups.OfType<DeviceGroup>() where x.DeviceId == dev.DeviceId select x.GroupId).FirstOrDefault(),
-                                DeviceUid = dev.DeviceUid
-                            });
-                        }
-
+                        List<DeviceResponseModel> drmList = helperMethod.getDRMfromDeviceList(allDevices, mc);
                         int parsedPage = (page == null || page <= 0) ? 1 : (int)page;
                         int parsedPerPage = (per_page == null || per_page <= 0) ? 10 : (int)per_page;
                         string parsedName = name == null ? "" : name;
@@ -403,8 +437,9 @@ namespace MonitorWebAPI.Controllers
                                 filteredList = filteredList.OrderBy(x => x.DeviceId).ToList();
                                 break;
                         }
+                        int deviceCount = filteredList.Count;
                         filteredList = filteredList.Skip(skip).Take(parsedPerPage).ToList();
-                        return new ResponseModel<DevicePagingModel>() { data = new DevicePagingModel() { Devices = filteredList, DeviceCount = filteredList.Count }, newAccessToken = vu.accessToken };
+                        return new ResponseModel<DevicePagingModel>() { data = new DevicePagingModel() { Devices = filteredList, DeviceCount = deviceCount }, newAccessToken = vu.accessToken };
                     }
                     else
                     {

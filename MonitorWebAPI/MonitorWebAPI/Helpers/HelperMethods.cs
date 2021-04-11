@@ -277,5 +277,30 @@ namespace MonitorWebAPI.Helpers
         
         }
 
+
+        public List<DeviceResponseModel> getDRMfromDeviceList(List<Device> devices, monitorContext mc)
+        {
+            List<DeviceResponseModel> drmList = new List<DeviceResponseModel>();
+            foreach (var dev in devices)
+            {
+                int? groupIdForDevice = (from x in mc.DeviceGroups.OfType<DeviceGroup>() where x.DeviceId == dev.DeviceId select x.GroupId).FirstOrDefault();
+                drmList.Add(new DeviceResponseModel()
+                {
+                    DeviceId = dev.DeviceId,
+                    Name = dev.Name,
+                    Location = dev.Location,
+                    LocationLatitude = dev.LocationLatitude,
+                    LocationLongitude = dev.LocationLongitude,
+                    Status = dev.Status,
+                    LastTimeOnline = dev.LastTimeOnline,
+                    InstallationCode = dev.InstallationCode,
+                    GroupId = groupIdForDevice,
+                    GroupName = (from x in mc.Groups.OfType<Group>() where x.GroupId == groupIdForDevice select x.Name).FirstOrDefault(),
+                    DeviceUid = dev.DeviceUid
+                });
+            }
+            return drmList;
+        }
+
     }
 }
