@@ -31,6 +31,99 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/device/AllDevices")]
         [HttpGet]
+        public async Task<ActionResult<ResponseModel<List<Device>>>> GetAllDevices([FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
+                if (userRoleName == "MonitorSuperAdmin")
+                {
+
+                    return new ResponseModel<List<Device>>() { data = mc.Devices.ToList(), newAccessToken = vu.accessToken };
+                }
+                else
+                {
+                    List<Device> allDevices = mc.Devices.ToList();
+                    HelperMethods hm = new HelperMethods();
+                    List<DeviceResponseModel> myDevicesResponseModelList = new List<DeviceResponseModel>();
+                    List<DeviceResponseModel> drmList = new List<DeviceResponseModel>();
+                    List<int> subgroups = new List<int>();
+                    List<int> nonSubgroups = new List<int>();
+
+
+
+                    foreach (var dev in allDevices)
+                    {
+                        drmList.Add(new DeviceResponseModel()
+                        {
+                            DeviceId = dev.DeviceId,
+                            Name = dev.Name,
+                            Location = dev.Location,
+                            LocationLatitude = dev.LocationLatitude,
+                            LocationLongitude = dev.LocationLongitude,
+                            Status = dev.Status,
+                            LastTimeOnline = dev.LastTimeOnline,
+                            InstallationCode = dev.InstallationCode,
+                            GroupId = (from x in mc.DeviceGroups.OfType<DeviceGroup>() where x.DeviceId == dev.DeviceId select x.GroupId).FirstOrDefault()
+                        });
+                    }
+
+                    foreach (DeviceResponseModel dev in drmList)
+                    {
+                        try
+                        {
+                            if (subgroups.Contains((int)dev.GroupId))
+                            {
+                                myDevicesResponseModelList.Add(dev);
+                                continue;
+                            }
+                            if (nonSubgroups.Contains((int)dev.GroupId))
+                            {
+                                continue;
+                            }
+                            if (hm.CheckIfDeviceBelongsToUsersTree(vu, dev.DeviceId))
+                            {
+                                subgroups.Add((int)dev.GroupId);
+                                myDevicesResponseModelList.Add(dev);
+                            }
+                            else
+                            {
+                                nonSubgroups.Add(((int)dev.GroupId));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            return BadRequest(e.Message);
+                        }
+
+                    }
+                    List<Device> myDevices = new List<Device>();
+
+                    foreach (DeviceResponseModel dev in myDevicesResponseModelList)
+                    {
+                        myDevices.Add(mc.Devices.Where(x => x.DeviceId == dev.DeviceId).FirstOrDefault());
+                    }
+
+                    return new ResponseModel<List<Device>>() { data = myDevices, newAccessToken = vu.accessToken };
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+
+        [Route("api/device/AllDevicesForUser")]
+        [HttpGet]
         public async Task<ActionResult<ResponseModel<DevicePagingModel>>> AllDevicesForUser([FromQuery] int? page, [FromQuery] int? per_page, [FromQuery] string? name, [FromQuery] string? status, [FromQuery] int? groupId, string? sort_by, [FromQuery] string? location, [FromHeader] string Authorization)
         {
             string JWT = JWTVerify.GetToken(Authorization);
