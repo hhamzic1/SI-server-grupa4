@@ -648,6 +648,11 @@ namespace MonitorWebAPI.Controllers
                                     tempDeviceGroup.GroupId = groupId;
                                     mc.SaveChanges();
                                 }
+                                else
+                                {
+
+                                    return StatusCode(400, "The device does not belong to the same company");
+                                }
 
                                 
                             }
