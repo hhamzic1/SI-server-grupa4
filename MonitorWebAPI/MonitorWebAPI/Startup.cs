@@ -13,7 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.MemoryStorage;
-
+using Azure.Storage.Blobs;
+using MonitorWebAPI.Services;
 
 namespace MonitorWebAPI
 {
@@ -52,6 +53,9 @@ namespace MonitorWebAPI
                 .UseMemoryStorage());
             
             services.AddHangfireServer();
+
+            services.AddSingleton(x => new BlobServiceClient(Configuration.GetValue<string>("AzureBlobStorageConnectionString")));
+            services.AddSingleton<IBlobService, BlobService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

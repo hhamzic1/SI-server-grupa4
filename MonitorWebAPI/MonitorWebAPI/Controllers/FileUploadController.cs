@@ -101,7 +101,7 @@ namespace MonitorWebAPI.Controllers
                     var path = Path.Combine(hostingEnvironment.ContentRootPath, folderName);
 
 
-                    foreach (string file in Directory.GetFiles(path,ids.machineUid+"-"+ids.taskId+"*"))
+                    foreach (string file in Directory.GetFiles(path,ids.machineUid+"_"+ids.taskId+"*"))
                     {
                         
                         byte[] bytes = System.IO.File.ReadAllBytes(file);
