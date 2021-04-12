@@ -1,14 +1,22 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
+﻿using iText.Kernel.Colors;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Borders;
+using iText.Layout.Element;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MonitorWebAPI.Helpers;
 using MonitorWebAPI.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MonitorWebAPI.Controllers
 {
@@ -22,7 +30,7 @@ namespace MonitorWebAPI.Controllers
             mc = new monitorContext();
         }
 
-        [Route("api/report/AllReportsForUser")] //dodajapi/
+        [Route("api/report/AllReportsForUser")] 
         [HttpGet]
         public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> ReportsForUserById([FromHeader] string Authorization)
         {
@@ -332,5 +340,6 @@ namespace MonitorWebAPI.Controllers
                 return Unauthorized();
             }
         }
+
     }
 }

@@ -8,13 +8,18 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Mail;
+using System.Net;
+using Microsoft.Extensions.Configuration;
+using System.Net.Mime;
+using System.IO;
+using Microsoft.AspNetCore.Hosting.Server;
 
 namespace MonitorWebAPI.Helpers
 {
     public class HelperMethods
     {
-
-        public GroupHierarchyModel FindHierarchyTree(Group g)
+        public GroupHierarchyModel FindHierarchyTree(Models.Group g)
         {
             monitorContext mc = new monitorContext();
             GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = g.GroupId, Name = g.Name, SubGroups = new List<GroupHierarchyModel>() };
@@ -35,7 +40,7 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
-        public GroupHierarchyModel FindHierarchyTreeWithDevices(Group g)
+        public GroupHierarchyModel FindHierarchyTreeWithDevices(Models.Group g)
         {
             monitorContext mc = new monitorContext();
             GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = g.GroupId, Name = g.Name, SubGroups = new List<GroupHierarchyModel>() };
@@ -107,7 +112,7 @@ namespace MonitorWebAPI.Helpers
             monitorContext mc = new monitorContext();
             string groupName = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault().Name;
 
-            Group tempGroup  = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
+            Models.Group tempGroup  = mc.Groups.Where(x => x.GroupId == groupId).FirstOrDefault();
             if (tempGroup == null)
             {
                 throw new NullReferenceException("Group with that id doesn't exist!");
@@ -163,6 +168,39 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
+        public string SendEmailTest(int id)
+        {
+            return sendEmail(id, "test@test.com");
+        }
+
+        public static string sendEmail(int id, String email)
+        {
+            monitorContext mc = new monitorContext();
+
+            var smptClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("reporting.monitor@gmail.com", "monitor2021"),
+                EnableSsl = true
+            };
+
+            var instanceName = CreatePDF.GenerateInstanceName(id);
+            var pdfDocument = CreatePDF.createPDF(id, instanceName);
+            var linkToAzure = BlobUpload.UploadPDFAsync(instanceName);
+
+            MailMessage message = new MailMessage(
+                "reporting.monitor@gmail.com",
+                email,
+                "Monitor app report",
+                "Report for your report request with id " + id);
+
+            message.Attachments.Add(new Attachment(Directory.GetCurrentDirectory() + "/data/" + instanceName));
+
+            smptClient.Send(message);
+
+            return instanceName;
+        }
+
         public static void CronJob()
         {
             DateTime now = DateTime.Now;
@@ -173,8 +211,18 @@ namespace MonitorWebAPI.Helpers
             foreach (var rep in reports)
             {
                 
-                if (rep.NextDate.Equals(dateTime))
+                if (TimeZoneInfo.ConvertTimeToUtc(rep.NextDate).Equals(dateTime))
                 {
+                    string linkToAzure = "";
+
+                    if (rep.SendEmail.Equals(true))
+                    {
+                        var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
+
+                        linkToAzure = sendEmail(rep.ReportId, email);
+                    }
+
+                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " instance", ReportId = rep.ReportId, UriLink = "https://si2021storage.blob.core.windows.net/si2021pdf/" + linkToAzure, Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
                     if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(7);
@@ -193,7 +241,6 @@ namespace MonitorWebAPI.Helpers
 
                     }
 
-                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " " + rep.NextDate, ReportId = rep.ReportId, UriLink = "ftp://..." });
                     mc.SaveChanges();
 
                 }
@@ -240,6 +287,32 @@ namespace MonitorWebAPI.Helpers
             var data = new StringContent(content, Encoding.UTF8, "application/json");
             return await client.PostAsync("https://si-grupa5.herokuapp.com/api/web/agent/file/put", data);
         }
+
+        public static DateTime GetStartDate(DateTime endDate, string frequency)
+        {
+            DateTime startDate = new DateTime();
+
+            if (frequency.ToUpper().Equals("DAILY"))
+            {
+                startDate = endDate.AddDays(-1);
+            }
+            else if (frequency.ToUpper().Equals("WEEKLY"))
+            {
+                startDate = endDate.AddDays(-7);
+            }
+            else if (frequency.ToUpper().Equals("MONTHLY"))
+            {
+                startDate = endDate.AddMonths(-1);
+            }
+            else if (frequency.ToUpper().Equals("YEARLY"))
+            {
+                startDate = endDate.AddYears(-1);
+            }
+
+            return startDate;
+        } 
+
+        
 
 
         public bool CheckBaseGroup(int? groupId1, int? groupId2)
