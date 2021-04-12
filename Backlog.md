@@ -43,13 +43,12 @@ App must provide possibility for viewing the average hardware usage for user's d
 - Merge branches
 
 ## Feature 
-Update device information, save and view command logs
+Save and view command logs
 ### Item
-App must provide possibility to update device information as well as providing the ability to save command logs to the database and then viewing them.
+App must provide the ability to save command logs to the database and then viewing them.
 #### Task
 - Create a new branch and switch to it
 - Re-scaffold model from the database
-- Create route for device information update
 - Create route for viewing all devices with enabled pagination
 - Create routes for viewing information of all users
 - Create routes for saving aand viewing command logs
