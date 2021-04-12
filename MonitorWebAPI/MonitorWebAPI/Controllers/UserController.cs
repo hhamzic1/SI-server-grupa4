@@ -35,7 +35,7 @@ namespace MonitorWebAPI.Controllers
         [HttpGet]
         public ActionResult UploadTestRoute()
         {
-            return Ok(helperMethod.SendEmailTest(54));
+            return Ok(helperMethod.SendEmailTest(2));
         }
 
 

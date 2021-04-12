@@ -1,11 +1,7 @@
 ﻿using Azure.Storage.Blobs;
-using iText.Kernel.Colors;
-using iText.Kernel.Pdf;
-using iText.Layout;
-using iText.Layout.Borders;
-using iText.Layout.Element;
-using iText.License;
 using MonitorWebAPI.Models;
+using SautinSoft.Document;
+using SautinSoft.Document.Tables;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,12 +18,12 @@ namespace MonitorWebAPI.Helpers
             Report report = mc.Reports
                 .Where(r => r.ReportId == reportId)
                 .FirstOrDefault();
-
-            string instanceName = report.Name + "-" + report.NextDate.ToString() + ".pdf";
+            Random random = new Random();
+            string instanceName = "Report-" + random.Next(9999999) + ".pdf";
             return instanceName;
         }
 
-        public static Document createPDF(int reportId, string instanceName)
+        public static DocumentCore createPDF(int reportId, string instanceName)
         {
             monitorContext mc = new monitorContext();
 
@@ -35,34 +31,40 @@ namespace MonitorWebAPI.Helpers
                 .Where(r => r.ReportId == reportId)
                 .FirstOrDefault();
 
-            string destination = "../../data/"+instanceName;
-            LicenseKey.LoadLicenseFile("Helpers\\itextkey.xml");
+            string documentPath = "Helpers/data/"+instanceName;
+            DocumentCore dc = new DocumentCore();
+            Section s = new Section(dc);
+            s.PageSetup.PaperType = PaperType.A4;
+            s.PageSetup.Orientation = Orientation.Portrait;
+            s.PageSetup.PageMargins = new PageMargins()
+            {
+                Left = LengthUnitConverter.Convert(0.1, LengthUnit.Centimeter, LengthUnit.Point),
+            };
+            dc.Sections.Add(s);
+
 
             DateTime startDate = HelperMethods.GetStartDate(report.NextDate, report.Frequency);
 
-            PdfWriter pdfWriter = new PdfWriter(destination);
-            PdfDocument pdfDocument = new PdfDocument(pdfWriter);
-            pdfDocument.AddNewPage();
-            Document document = new Document(pdfDocument);
+            Paragraph header = new Paragraph(dc);
+            header.ParagraphFormat.Alignment = HorizontalAlignment.Center;
+            header.Content.Start.Insert("Monitor Reporting", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#607494"), Size = 25.0, Bold = true });
 
-            Paragraph header = new Paragraph("Monitor Reporting")
-                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
-                .SetFontColor(new DeviceRgb(96, 116, 148))
-                .SetBold()
-                .SetFontSize(25);
+            Paragraph reportName = new Paragraph(dc);
+            reportName.ParagraphFormat.Alignment = HorizontalAlignment.Left;
+            reportName.Content.Start.Insert("Report name: " + report.Name,
+                new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 16.0, Bold = true });
 
-            Paragraph ReportName = new Paragraph("Report name: " + report.Name +
-                "\n" + report.Frequency + " report: " +
+            Paragraph date = new Paragraph(dc);
+            date.ParagraphFormat.Alignment = HorizontalAlignment.Left;
+            date.Content.Start.Insert(report.Frequency + " report: " +
                 startDate.ToString("G", CultureInfo.CreateSpecificCulture("de-DE")) + " - " +
-                report.NextDate.ToString("G", CultureInfo.CreateSpecificCulture("de-DE")))
-                .SetTextAlignment(iText.Layout.Properties.TextAlignment.LEFT)
-                .SetFontSize(16)
-                .SetBorderBottom(new SolidBorder(new DeviceRgb(189, 189, 189), 1))
-                .SetFontColor(new DeviceRgb(189, 189, 189))
-                .SetMarginTop(10)
-                .SetMarginBottom(25);
+                report.NextDate.ToString("G", CultureInfo.CreateSpecificCulture("de-DE")),
+                new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 16.0, Bold = true });
 
-            //popraviti da se sa fronta salje ispravan query i da se to promijeni u bazi 
+            s.Blocks.Add(header);
+            s.Blocks.Add(reportName);
+            s.Blocks.Add(date);
+
 
             QueryModel queryModel = System.Text.Json.JsonSerializer.Deserialize<QueryModel>(report.Query);
             queryModel.GenerateQuery();
@@ -77,7 +79,7 @@ namespace MonitorWebAPI.Helpers
                 p => p.DeviceId,
                 q => q.DeviceId,
                 (p, q) => new { Device = p, DeviceGroup = q })
-                .Where(d => d.DeviceGroup.GroupId == groupId) //dodati datume
+                .Where(d => d.DeviceGroup.GroupId == groupId)
                 .Select(dd => new Device
                 {
                     DeviceId = dd.Device.DeviceId,
@@ -131,9 +133,12 @@ namespace MonitorWebAPI.Helpers
 
             int numberOfSelectedCols = queryModel.select.Count();
 
-            Table table = new Table(numberOfSelectedCols, true);
+            Table table = new Table(dc);
+            double width = LengthUnitConverter.Convert(200, LengthUnit.Millimeter, LengthUnit.Point);
+            table.TableFormat.PreferredWidth = new TableWidth(width, TableWidthUnit.Point);
+            table.TableFormat.Alignment = HorizontalAlignment.Left;
 
-            List<Cell> labels = new List<Cell>();
+           
 
             List<String> stringLabels = new List<string>();
 
@@ -154,74 +159,97 @@ namespace MonitorWebAPI.Helpers
                 }
             }
 
-
+            TableRow firstRow = new TableRow(dc);
             for (int i = 0; i < numberOfSelectedCols; i++)
             {
-                table.AddCell(new Cell().Add(new Paragraph(stringLabels[i])
-                .SetFontColor(new DeviceRgb(96, 116, 148))
-                .SetBold()
-                .SetVerticalAlignment(iText.Layout.Properties.VerticalAlignment.MIDDLE)));
+                TableCell cell = new TableCell(dc);
+                cell.CellFormat.Borders.SetBorders(MultipleBorderTypes.Outside, BorderStyle.ThickThinSmallGap, Color.Gray, 1.0);
+                cell.CellFormat.PreferredWidth = new TableWidth(width / numberOfSelectedCols, TableWidthUnit.Point);
+                Paragraph text = new Paragraph(dc);
+                text.Content.Start.Insert(stringLabels[i], new CharacterFormat() { FontName = "Arial", FontColor = new Color("#607494"), Size = 12.0, Bold = true });
+                cell.Blocks.Add(text);
+                firstRow.Cells.Add(cell);
             }
+
+            table.Rows.Add(firstRow);
 
 
             foreach (var allInfoForDevice in allInfoForDevices)
             {
-                var name = new Paragraph(allInfoForDevice.Device.Name);
-                var location = new Paragraph(allInfoForDevice.Device.Location);
-                var latitude = new Paragraph(allInfoForDevice.Device.LocationLatitude.ToString());
-                var longitude = new Paragraph(allInfoForDevice.Device.LocationLongitude.ToString());
-                var status = new Paragraph(allInfoForDevice.Device.Status.ToString());
-                var lastTimeOnline = new Paragraph(allInfoForDevice.Device.LastTimeOnline.ToString());
-                Paragraph ram, gpu, cpu, hdd;
+                Paragraph name = new Paragraph(dc);
+                name.Content.Start.Insert(allInfoForDevice.Device.Name, new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+
+                Paragraph location = new Paragraph(dc);
+                location.Content.Start.Insert(allInfoForDevice.Device.Location, new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+
+                Paragraph latitude = new Paragraph(dc);
+                latitude.Content.Start.Insert(allInfoForDevice.Device.LocationLatitude.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+
+                Paragraph longitude = new Paragraph(dc);
+                longitude.Content.Start.Insert(allInfoForDevice.Device.LocationLongitude.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+
+                Paragraph status = new Paragraph(dc);
+                status.Content.Start.Insert(allInfoForDevice.Device.Status.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+
+                Paragraph lastTimeOnline = new Paragraph(dc);
+                lastTimeOnline.Content.Start.Insert(allInfoForDevice.Device.LastTimeOnline.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+
+                Paragraph ram = new Paragraph(dc);
+                Paragraph gpu = new Paragraph(dc);
+                Paragraph cpu = new Paragraph(dc);
+                Paragraph hdd = new Paragraph(dc);
+
                 if (allInfoForDevice.Averages == null)
                 {
-                    ram = new Paragraph("Nema podataka o RamUsage");
-                    gpu = new Paragraph("Nema podataka o GpuUsage");
-                    cpu = new Paragraph("Nema podataka o CpuUsage");
-                    hdd = new Paragraph("Nema podataka o HddUsage");
+                    ram.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                    gpu.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                    cpu.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                    hdd.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
                 }
                 else
                 {
-                    ram = new Paragraph(allInfoForDevice.Averages.RamUsage.ToString());
-                    gpu = new Paragraph(allInfoForDevice.Averages.Gpuusage.ToString());
-                    cpu = new Paragraph(allInfoForDevice.Averages.CpuUsage.ToString());
-                    hdd = new Paragraph(allInfoForDevice.Averages.Hddusage.ToString());
+                    ram.Content.Start.Insert(allInfoForDevice.Averages.RamUsage.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                    gpu.Content.Start.Insert(allInfoForDevice.Averages.Gpuusage.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                    cpu.Content.Start.Insert(allInfoForDevice.Averages.CpuUsage.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                    hdd.Content.Start.Insert(allInfoForDevice.Averages.Hddusage.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
                 }
 
-                var groupName = new Paragraph(selectedGroup.Name);
+                Paragraph groupName = new Paragraph(dc);
+                groupName.Content.Start.Insert(selectedGroup.Name, new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
 
-                List<Cell> tableDataCells = new List<Cell>();
-
+                TableRow dataRow = new TableRow(dc);
                 foreach (var label in queryModel.select)
                 {
+                    TableCell dataCell = new TableCell(dc);
+                    dataCell.CellFormat.Borders.SetBorders(MultipleBorderTypes.Outside, BorderStyle.ThickThinSmallGap, Color.Gray, 1.0);
+                    dataCell.CellFormat.PreferredWidth = new TableWidth(width / numberOfSelectedCols, TableWidthUnit.Point);
+
                     switch (label)
                     {
-                        case "name": tableDataCells.Add(new Cell().Add(name)); break;
-                        case "avgRamUsage": tableDataCells.Add(new Cell().Add(ram)); break;
-                        case "avgGpuUsage": tableDataCells.Add(new Cell().Add(gpu)); break;
-                        case "quarterlyCpuUsage": tableDataCells.Add(new Cell().Add(cpu)); break;
-                        case "diskUtilization": tableDataCells.Add(new Cell().Add(hdd)); break;
-                        case "location": tableDataCells.Add(new Cell().Add(location)); break;
-                        case "latitude": tableDataCells.Add(new Cell().Add(latitude)); break;
-                        case "longitude": tableDataCells.Add(new Cell().Add(longitude)); break;
-                        case "status": tableDataCells.Add(new Cell().Add(status)); break;
-                        case "groupName": tableDataCells.Add(new Cell().Add(groupName)); break;
+                        case "name": dataCell.Blocks.Add(name); break;
+                        case "avgRamUsage": dataCell.Blocks.Add(ram); break;
+                        case "avgGpuUsage": dataCell.Blocks.Add(gpu); break;
+                        case "quarterlyCpuUsage": dataCell.Blocks.Add(cpu); break;
+                        case "diskUtilization": dataCell.Blocks.Add(hdd); break;
+                        case "location": dataCell.Blocks.Add(location); break;
+                        case "latitude": dataCell.Blocks.Add(latitude); break;
+                        case "longitude": dataCell.Blocks.Add(longitude); break;
+                        case "status": dataCell.Blocks.Add(status); break;
+                        case "groupName": dataCell.Blocks.Add(groupName); break;
                     }
+
+                    dataRow.Cells.Add(dataCell);
                 }
 
-                foreach (var cell in tableDataCells)
-                {
-                    table.AddCell(cell);
-                }
+                table.Rows.Add(dataRow);
 
             }
 
-            document.Add(header);
-            document.Add(ReportName);
-            document.Add(table);
-            document.Close();
+            s.Blocks.Add(table);
 
-            return document;
+            dc.Save(documentPath, new PdfSaveOptions() { Compliance = PdfCompliance.PDF_A1a });
+
+            return dc;
         }
     }
 }
