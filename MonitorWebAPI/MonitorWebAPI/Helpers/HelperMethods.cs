@@ -212,8 +212,16 @@ namespace MonitorWebAPI.Helpers
                 
                 if (TimeZoneInfo.ConvertTimeToUtc(rep.NextDate).Equals(dateTime))
                 {
-                    
-                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " instance", ReportId = rep.ReportId, UriLink = "ftp://...", Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
+                    string linkToAzure = "";
+
+                    if (rep.SendEmail.Equals(true))
+                    {
+                        var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
+
+                        linkToAzure = sendEmail(rep.ReportId, email);
+                    }
+
+                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " instance", ReportId = rep.ReportId, UriLink = linkToAzure, Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
                     if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(7);
@@ -234,12 +242,6 @@ namespace MonitorWebAPI.Helpers
 
                     mc.SaveChanges();
 
-                    if (rep.SendEmail.Equals(true))
-                    {
-                        var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
-
-                        sendEmail(rep.ReportId, email);
-                    }
                 }
 
             }
