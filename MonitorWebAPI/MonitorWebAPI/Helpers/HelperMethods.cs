@@ -12,6 +12,7 @@ using System.Net;
 using Microsoft.Extensions.Configuration;
 using System.Net.Mime;
 using System.IO;
+using Microsoft.AspNetCore.Hosting.Server;
 
 namespace MonitorWebAPI.Helpers
 {
@@ -192,14 +193,11 @@ namespace MonitorWebAPI.Helpers
                 "Monitor app report",
                 "Report for your report request with id " + id);
 
+            message.Attachments.Add(new Attachment(Directory.GetCurrentDirectory() + "/data/" + instanceName));
 
-            FileStream from_stream = File.OpenRead("./data/" + instanceName);
-            Attachment data = new Attachment(from_stream, MediaTypeNames.Application.Octet);
-
-            message.Attachments.Add(data);
             smptClient.Send(message);
 
-            return linkToAzure.ToString();
+            return instanceName;
         }
 
         public static void CronJob()
@@ -223,7 +221,7 @@ namespace MonitorWebAPI.Helpers
                         linkToAzure = sendEmail(rep.ReportId, email);
                     }
 
-                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " instance", ReportId = rep.ReportId, UriLink = linkToAzure, Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
+                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " instance", ReportId = rep.ReportId, UriLink = "https://si2021storage.blob.core.windows.net/si2021pdf/" + linkToAzure, Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
                     if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(7);

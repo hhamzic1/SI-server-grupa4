@@ -35,12 +35,6 @@ namespace MonitorWebAPI.Helpers
             string documentPath = Directory.GetCurrentDirectory() + "/data/" + instanceName;
             DocumentCore dc = new DocumentCore();
             Section s = new Section(dc);
-            s.PageSetup.PaperType = PaperType.A4;
-            s.PageSetup.Orientation = Orientation.Portrait;
-            s.PageSetup.PageMargins = new PageMargins()
-            {
-                Left = LengthUnitConverter.Convert(0.1, LengthUnit.Centimeter, LengthUnit.Point),
-            };
             dc.Sections.Add(s);
 
 
@@ -48,19 +42,19 @@ namespace MonitorWebAPI.Helpers
 
             Paragraph header = new Paragraph(dc);
             header.ParagraphFormat.Alignment = HorizontalAlignment.Center;
-            header.Content.Start.Insert("Monitor Reporting", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#607494"), Size = 25.0, Bold = true });
+            header.Content.Start.Insert("Monitor Reporting", new CharacterFormat() { FontColor = new Color("#607494"), Size = 20.0, Bold = true });
 
             Paragraph reportName = new Paragraph(dc);
             reportName.ParagraphFormat.Alignment = HorizontalAlignment.Left;
             reportName.Content.Start.Insert("Report name: " + report.Name,
-                new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 16.0, Bold = true });
+                new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
 
             Paragraph date = new Paragraph(dc);
             date.ParagraphFormat.Alignment = HorizontalAlignment.Left;
             date.Content.Start.Insert(report.Frequency + " report: " +
                 startDate.ToString("G", CultureInfo.CreateSpecificCulture("de-DE")) + " - " +
                 report.NextDate.ToString("G", CultureInfo.CreateSpecificCulture("de-DE")),
-                new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 16.0, Bold = true });
+                new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
 
             s.Blocks.Add(header);
             s.Blocks.Add(reportName);
@@ -182,7 +176,7 @@ namespace MonitorWebAPI.Helpers
                 cell.CellFormat.Borders.SetBorders(MultipleBorderTypes.Outside, BorderStyle.ThickThinSmallGap, Color.Gray, 1.0);
                 cell.CellFormat.PreferredWidth = new TableWidth(width / numberOfSelectedCols, TableWidthUnit.Point);
                 Paragraph text = new Paragraph(dc);
-                text.Content.Start.Insert(stringLabels[i], new CharacterFormat() { FontName = "Arial", FontColor = new Color("#607494"), Size = 12.0, Bold = true });
+                text.Content.Start.Insert(stringLabels[i], new CharacterFormat() { FontColor = new Color("#607494"), Size = 8.0, Bold = true });
                 cell.Blocks.Add(text);
                 firstRow.Cells.Add(cell);
             }
@@ -193,22 +187,22 @@ namespace MonitorWebAPI.Helpers
             foreach (var allInfoForDevice in allInfoForDevices)
             {
                 Paragraph name = new Paragraph(dc);
-                name.Content.Start.Insert(allInfoForDevice.Device.Name, new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                name.Content.Start.Insert(allInfoForDevice.Device.Name, new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
 
                 Paragraph location = new Paragraph(dc);
-                location.Content.Start.Insert(allInfoForDevice.Device.Location, new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                location.Content.Start.Insert(allInfoForDevice.Device.Location, new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
 
                 Paragraph latitude = new Paragraph(dc);
-                latitude.Content.Start.Insert(allInfoForDevice.Device.LocationLatitude.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                latitude.Content.Start.Insert(allInfoForDevice.Device.LocationLatitude.ToString(), new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
 
                 Paragraph longitude = new Paragraph(dc);
-                longitude.Content.Start.Insert(allInfoForDevice.Device.LocationLongitude.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                longitude.Content.Start.Insert(allInfoForDevice.Device.LocationLongitude.ToString(), new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
 
                 Paragraph status = new Paragraph(dc);
-                status.Content.Start.Insert(allInfoForDevice.Device.Status.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                status.Content.Start.Insert(allInfoForDevice.Device.Status.ToString(), new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
 
                 Paragraph lastTimeOnline = new Paragraph(dc);
-                lastTimeOnline.Content.Start.Insert(allInfoForDevice.Device.LastTimeOnline.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                lastTimeOnline.Content.Start.Insert(allInfoForDevice.Device.LastTimeOnline.ToString(), new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
 
                 Paragraph ram = new Paragraph(dc);
                 Paragraph gpu = new Paragraph(dc);
@@ -217,21 +211,21 @@ namespace MonitorWebAPI.Helpers
 
                 if (allInfoForDevice.Averages == null)
                 {
-                    ram.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
-                    gpu.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
-                    cpu.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
-                    hdd.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                    ram.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
+                    gpu.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
+                    cpu.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
+                    hdd.Content.Start.Insert("Nema podataka o RamUsage", new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
                 }
                 else
                 {
-                    ram.Content.Start.Insert(allInfoForDevice.Averages.RamUsage.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
-                    gpu.Content.Start.Insert(allInfoForDevice.Averages.Gpuusage.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
-                    cpu.Content.Start.Insert(allInfoForDevice.Averages.CpuUsage.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
-                    hdd.Content.Start.Insert(allInfoForDevice.Averages.Hddusage.ToString(), new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                    ram.Content.Start.Insert(allInfoForDevice.Averages.RamUsage.ToString(), new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
+                    gpu.Content.Start.Insert(allInfoForDevice.Averages.Gpuusage.ToString(), new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
+                    cpu.Content.Start.Insert(allInfoForDevice.Averages.CpuUsage.ToString(), new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
+                    hdd.Content.Start.Insert(allInfoForDevice.Averages.Hddusage.ToString(), new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
                 }
 
                 Paragraph groupName = new Paragraph(dc);
-                groupName.Content.Start.Insert(selectedGroup.Name, new CharacterFormat() { FontName = "Arial", FontColor = new Color("#8a8d91"), Size = 12.0, Bold = true });
+                groupName.Content.Start.Insert(selectedGroup.Name, new CharacterFormat() { FontColor = new Color("#8a8d91"), Size = 8.0, Bold = true });
 
                 TableRow dataRow = new TableRow(dc);
                 foreach (var label in queryModel.select)
