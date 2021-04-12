@@ -13,7 +13,7 @@ namespace MonitorWebAPI.Helpers
         public string value { get; set; }
         public string operator_str { get; set; }
 
-        public bool Eval(Device d)
+        public bool Eval(AllInfoForDevice d)
         {
             string field_value = GetFieldFromDevice(d);
             return EvalOperator(field_value);
@@ -54,19 +54,19 @@ namespace MonitorWebAPI.Helpers
             return true;
         }
 
-        private string GetFieldFromDevice(Device d)
+        private string GetFieldFromDevice(AllInfoForDevice d)
         {
             switch (field)
             {
-                case "avgRamUsage": throw new NotImplementedException();
-                case "avgGpuUsage": throw new NotImplementedException();
-                case "quarterlyCpuUsage": throw new NotImplementedException();
-                case "diskUtilization": throw new NotImplementedException();
-                case "name": return d.Name;
-                case "location": return d.Location;
-                case "latitude": return d.LocationLatitude.ToString();
-                case "longitude": return d.LocationLongitude.ToString();
-                case "status": return d.Status.ToString();
+                case "avgRamUsage": return  d.Averages.RamUsage.ToString();
+                case "avgGpuUsage": return d.Averages.Gpuusage.ToString();
+                case "quarterlyCpuUsage": return d.Averages.CpuUsage.ToString();
+                case "diskUtilization": return d.Averages.Hddusage.ToString();
+                case "name": return d.Device.Name;
+                case "location": return d.Device.Location;
+                case "latitude": return d.Device.LocationLatitude.ToString();
+                case "longitude": return d.Device.LocationLongitude.ToString();
+                case "status": return d.Device.Status.ToString();
                 case "groupName": throw new NotImplementedException();
             }
 

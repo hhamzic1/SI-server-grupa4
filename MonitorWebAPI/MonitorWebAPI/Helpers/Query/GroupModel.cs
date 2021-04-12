@@ -36,7 +36,7 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
-        public bool Eval(Device d)
+        public bool Eval(AllInfoForDevice d)
         {
             //return (rules == null);
             if (rule_items == null) GenerateItems();
@@ -46,19 +46,6 @@ namespace MonitorWebAPI.Helpers
             {
                 bool ev = item.Eval(d);
                 return_val = combinator.ToLower().Equals("and") ? ev && return_val : ev || return_val;
-
-                /*
-                if (item.IsRule())
-                {
-                    bool ev = item.Eval(d);
-                    return_val = combinator.ToLower().Equals("and") ? ev && return_val : ev || return_val;
-                }
-                else
-                {
-                    bool ev = item.Eval(d);
-                    return_val = combinator.ToLower().Equals("and") ? ev && return_val : ev || return_val;
-                }
-                */
             }
 
 
