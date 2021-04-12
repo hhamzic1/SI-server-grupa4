@@ -15,16 +15,8 @@ namespace MonitorWebAPI.Helpers
 {
     public class CreatePDF
     {
-        private readonly Services.IBlobService _blobService;
-
-        public CreatePDF(Services.IBlobService blobService)
+        public static string GenerateInstanceName(int reportId)
         {
-            _blobService = blobService;
-        }
-
-        public static Document createPDF(int reportId)
-        {
-
             monitorContext mc = new monitorContext();
 
             Report report = mc.Reports
@@ -32,6 +24,17 @@ namespace MonitorWebAPI.Helpers
                 .FirstOrDefault();
 
             string instanceName = report.Name + "-" + report.NextDate.ToString() + ".pdf";
+            return instanceName;
+        }
+
+        public static Document createPDF(int reportId, string instanceName)
+        {
+            monitorContext mc = new monitorContext();
+
+            Report report = mc.Reports
+                .Where(r => r.ReportId == reportId)
+                .FirstOrDefault();
+
             string destination = "../../data/"+instanceName;
             LicenseKey.LoadLicenseFile("Helpers\\itextkey.xml");
 

@@ -17,9 +17,11 @@ namespace MonitorWebAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly monitorContext mc;
+        private HelperMethods helperMethod;
         public UserController()
         {
             mc = new monitorContext();
+            helperMethod = new HelperMethods();
         }
 
         [Route("/api/hello-world")]
@@ -27,6 +29,13 @@ namespace MonitorWebAPI.Controllers
         public ActionResult HelloWorld()
         {
             return Ok("Hello world");
+        }
+
+        [Route("/api/uploadtest")]
+        [HttpGet]
+        public ActionResult UploadTestRoute()
+        {
+            return Ok(helperMethod.SendEmailTest(54));
         }
 
 

@@ -9,12 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Mail;
 using System.Net;
+using Microsoft.Extensions.Configuration;
 
 namespace MonitorWebAPI.Helpers
 {
     public class HelperMethods
     {
-
         public GroupHierarchyModel FindHierarchyTree(Models.Group g)
         {
             monitorContext mc = new monitorContext();
@@ -164,21 +164,27 @@ namespace MonitorWebAPI.Helpers
             }
         }
 
-        public static void sendEmail(int id, String email)
+        public string SendEmailTest(int id)
         {
-            var smptClient = new SmtpClient("smtp.gmail.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential("neki naš mail", "neki naš password"),
-                EnableSsl = true
-            };
+            return sendEmail(id, "test@test.com");
+        }
 
-            var pdf = createPDF(id);
+        public static string sendEmail(int id, String email)
+        {
+            //var smptClient = new SmtpClient("smtp.gmail.com")
+            //{
+            //    Port = 587,
+            //    Credentials = new NetworkCredential("neki naš mail", "neki naš password"),
+            //    EnableSsl = true
+            //};
 
-            upload(pdf)
+            var instanceName = CreatePDF.GenerateInstanceName(id);
+            var pdfDocument = CreatePDF.createPDF(id, instanceName);
+            var linkToAzure = BlobUpload.UploadPDFAsync(instanceName);
 
-            smptClient.Send("neki naš mail", email, "subject", "body");
+            //smptClient.Send("neki naš mail", email, "subject", "body");
 
+            return linkToAzure.ToString();
         }
 
         public static void CronJob()
