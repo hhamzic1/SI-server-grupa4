@@ -33,7 +33,6 @@ Sprint 3:
 
 Sprint 4:
 
-    * Kao korisnik želim da se omogući ažuriranje podataka o mašini
     * Kao korisnik želim da se omogući spašavanje historije mojih komandnih loggova u bazu
     * Kao korisnik želim da se omogući pregled mojih loggova na određenoj mašini
     * Kao korisnik želim da se omogući pregled loggova određenog korisnika na određenoj mašini
@@ -116,12 +115,6 @@ Sprint 4:
   [HttpGet]
   
   * Vraća sve logove mašine za sve mašine kojim logovani korisnik ima pristup
-
-* [Route("api/device/{groupId}")] 
-
-  [HttpPut]
-  
-  * Omogućava ažuriranje mašine ukoliko se ona nalazi pod ovlasti trenutno loggovanog korisnika
 
 ### Rute za file upload
 
