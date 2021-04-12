@@ -10,6 +10,6 @@ namespace MonitorWebAPI.Helpers.Query
     {
         bool IsGroup();
         bool IsRule();
-        bool Eval(Device d);
+        bool Eval(AllInfoForDevice d);
     }
 }

@@ -66,6 +66,8 @@ namespace MonitorWebAPI.Helpers
             s.Blocks.Add(reportName);
             s.Blocks.Add(date);
 
+            // ---------------------------------------------------------------------------
+            // ---------------------------------------------------------------------------
 
             QueryModel queryModel = System.Text.Json.JsonSerializer.Deserialize<QueryModel>(report.Query);
             queryModel.GenerateQuery();
@@ -96,13 +98,16 @@ namespace MonitorWebAPI.Helpers
 
             List<Device> allDevices = new List<Device>();
 
+            /* Old way
             foreach (var device in devices)
             {
-                if (queryModel.query.Eval(device))
+                if (true || queryModel.query.Eval(device))
                 {
                     allDevices.Add(device);
                 }
             }
+            */
+            allDevices = devices;
 
 
             List<AllInfoForDevice> allInfoForDevices = new List<AllInfoForDevice>();
@@ -130,6 +135,16 @@ namespace MonitorWebAPI.Helpers
                 allInfoForDevices.Add(allInfo);
 
             }
+
+            List<AllInfoForDevice> allInfoForDevicesFilter = new List<AllInfoForDevice>();
+            foreach (var device in allInfoForDevices)
+            {
+                if (queryModel.query.Eval(device))
+                {
+                    allInfoForDevicesFilter.Add(device);
+                }
+            }
+            allInfoForDevices = allInfoForDevicesFilter;
 
 
             int numberOfSelectedCols = queryModel.select.Count();
