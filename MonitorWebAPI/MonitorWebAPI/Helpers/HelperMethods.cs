@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Net.Mail;
 using System.Net;
 using Microsoft.Extensions.Configuration;
+using System.Net.Mime;
 
 namespace MonitorWebAPI.Helpers
 {
@@ -171,18 +172,30 @@ namespace MonitorWebAPI.Helpers
 
         public static string sendEmail(int id, String email)
         {
-            //var smptClient = new SmtpClient("smtp.gmail.com")
-            //{
-            //    Port = 587,
-            //    Credentials = new NetworkCredential("neki naš mail", "neki naš password"),
-            //    EnableSsl = true
-            //};
+            monitorContext mc = new monitorContext();
+
+            var smptClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("reporting.monitor@gmail.com", "monitor2021"),
+                EnableSsl = true
+            };
 
             var instanceName = CreatePDF.GenerateInstanceName(id);
             var pdfDocument = CreatePDF.createPDF(id, instanceName);
             var linkToAzure = BlobUpload.UploadPDFAsync(instanceName);
 
-            //smptClient.Send("neki naš mail", email, "subject", "body");
+            MailMessage message = new MailMessage(
+                "reporting.monitor@gmail.com",
+                email,
+                "Monitor app report",
+                "Report for your report request with id " + id);
+
+
+            Attachment data = new Attachment(linkToAzure.ToString(), MediaTypeNames.Application.Octet);
+
+            message.Attachments.Add(data);
+            smptClient.Send(message);
 
             return linkToAzure.ToString();
         }
@@ -199,8 +212,16 @@ namespace MonitorWebAPI.Helpers
                 
                 if (TimeZoneInfo.ConvertTimeToUtc(rep.NextDate).Equals(dateTime))
                 {
-                    
-                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " instance", ReportId = rep.ReportId, UriLink = "ftp://...", Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
+                    string linkToAzure = "";
+
+                    if (rep.SendEmail.Equals(true))
+                    {
+                        var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
+
+                        linkToAzure = sendEmail(rep.ReportId, email);
+                    }
+
+                    mc.ReportInstances.Add(new ReportInstance() { Name = rep.Name + " instance", ReportId = rep.ReportId, UriLink = linkToAzure, Date = TimeZoneInfo.ConvertTimeToUtc(rep.NextDate) });
                     if (rep.Frequency.Equals("Weekly", StringComparison.InvariantCultureIgnoreCase))
                     {
                         rep.NextDate = rep.NextDate.AddDays(7);
@@ -221,12 +242,6 @@ namespace MonitorWebAPI.Helpers
 
                     mc.SaveChanges();
 
-                    if (rep.SendEmail.Equals(true))
-                    {
-                        var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
-
-                        sendEmail(rep.ReportId, email);
-                    }
                 }
 
             }
