@@ -5,6 +5,7 @@ using SautinSoft.Document.Tables;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace MonitorWebAPI.Helpers
@@ -31,7 +32,7 @@ namespace MonitorWebAPI.Helpers
                 .Where(r => r.ReportId == reportId)
                 .FirstOrDefault();
 
-            string documentPath = "Helpers/data/"+instanceName;
+            string documentPath = Directory.GetCurrentDirectory() + "/data/" + instanceName;
             DocumentCore dc = new DocumentCore();
             Section s = new Section(dc);
             s.PageSetup.PaperType = PaperType.A4;

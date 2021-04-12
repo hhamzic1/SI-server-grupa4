@@ -12,7 +12,7 @@ namespace MonitorWebAPI.Helpers
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient("DefaultEndpointsProtocol=https;AccountName=si2021storage;AccountKey=PosXPJcHI+74hYfFB6U4uncozVIxQSCHfKrueABlsrxup1NKUqlX2l+CtaI/GbkUPZ86Qs9QwQkEnFDM/Lkx2A==;EndpointSuffix=core.windows.net");
             BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("si2021pdf");
-            string localPath = "./data/";
+            string localPath = Directory.GetCurrentDirectory() + "/data/";
             string localFilePath = Path.Combine(localPath, fileName);
             using FileStream uploadFileStream = File.OpenRead(localFilePath);
             var blobClient = containerClient.GetBlobClient(fileName);

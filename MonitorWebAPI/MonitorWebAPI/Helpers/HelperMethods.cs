@@ -11,6 +11,7 @@ using System.Net.Mail;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using System.Net.Mime;
+using System.IO;
 
 namespace MonitorWebAPI.Helpers
 {
@@ -192,7 +193,8 @@ namespace MonitorWebAPI.Helpers
                 "Report for your report request with id " + id);
 
 
-            Attachment data = new Attachment(linkToAzure.ToString(), MediaTypeNames.Application.Octet);
+            FileStream from_stream = File.OpenRead("./data/" + instanceName);
+            Attachment data = new Attachment(from_stream, MediaTypeNames.Application.Octet);
 
             message.Attachments.Add(data);
             smptClient.Send(message);
