@@ -172,6 +172,8 @@ namespace MonitorWebAPI.Helpers
 
         public static string sendEmail(int id, String email)
         {
+            monitorContext mc = new monitorContext();
+
             var smptClient = new SmtpClient("smtp.gmail.com")
             {
                 Port = 587,
@@ -189,8 +191,10 @@ namespace MonitorWebAPI.Helpers
                 "Monitor app report",
                 "Report for your report request with id " + id);
 
-            //Attachment data = new Attachment(pdfDocument    , MediaTypeNames.Application.Octet);
 
+            Attachment data = new Attachment(linkToAzure.ToString(), MediaTypeNames.Application.Octet);
+
+            message.Attachments.Add(data);
             smptClient.Send(message);
 
             return linkToAzure.ToString();
