@@ -41,7 +41,7 @@ namespace MonitorWebAPI.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=monitor;Username=si-baza;Password=sipassword2021");
+                optionsBuilder.UseNpgsql("Host=167.99.244.168;Port=5432;Database=monitor;Username=si-baza;Password=sipassword2021");
             }
         }
 
