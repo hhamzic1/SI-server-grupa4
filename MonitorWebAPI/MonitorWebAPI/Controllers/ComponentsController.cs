@@ -4,13 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MonitorWebAPI.Helpers;
 using MonitorWebAPI.Models;
 using Newtonsoft.Json;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
+
 
 namespace MonitorWebAPI.Controllers
 {
