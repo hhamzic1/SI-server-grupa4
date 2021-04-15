@@ -9,6 +9,7 @@ namespace MonitorWebAPI.Models
     {
         public UserTask()
         {
+            Components = new HashSet<Component>();
             UserTrackers = new HashSet<UserTracker>();
         }
 
@@ -20,10 +21,12 @@ namespace MonitorWebAPI.Models
         public string Description { get; set; }
         public DateTime? EndTime { get; set; }
         public int StatusId { get; set; }
+        public bool PhotoUploaded { get; set; }
 
         public virtual Device Device { get; set; }
         public virtual TaskStatus Status { get; set; }
         public virtual User User { get; set; }
+        public virtual ICollection<Component> Components { get; set; }
         public virtual ICollection<UserTracker> UserTrackers { get; set; }
     }
 }

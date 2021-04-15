@@ -9,6 +9,7 @@ namespace MonitorWebAPI.Models
     {
         public Device()
         {
+            DeviceFiles = new HashSet<DeviceFile>();
             DeviceGroups = new HashSet<DeviceGroup>();
             ErrorLogs = new HashSet<ErrorLog>();
             UserCommandsLogs = new HashSet<UserCommandsLog>();
@@ -25,6 +26,7 @@ namespace MonitorWebAPI.Models
         public string InstallationCode { get; set; }
         public Guid DeviceUid { get; set; }
 
+        public virtual ICollection<DeviceFile> DeviceFiles { get; set; }
         public virtual ICollection<DeviceGroup> DeviceGroups { get; set; }
         public virtual ICollection<ErrorLog> ErrorLogs { get; set; }
         public virtual ICollection<UserCommandsLog> UserCommandsLogs { get; set; }

@@ -17,7 +17,9 @@ namespace MonitorWebAPI.Models
         {
         }
 
+        public virtual DbSet<Component> Components { get; set; }
         public virtual DbSet<Device> Devices { get; set; }
+        public virtual DbSet<DeviceFile> DeviceFiles { get; set; }
         public virtual DbSet<DeviceGroup> DeviceGroups { get; set; }
         public virtual DbSet<DeviceStatusLog> DeviceStatusLogs { get; set; }
         public virtual DbSet<ErrorDictionary> ErrorDictionaries { get; set; }
@@ -48,6 +50,26 @@ namespace MonitorWebAPI.Models
             modelBuilder.HasPostgresExtension("uuid-ossp")
                 .HasAnnotation("Relational:Collation", "C.UTF-8");
 
+            modelBuilder.Entity<Component>(entity =>
+            {
+                entity.ToTable("COMPONENT");
+
+                entity.HasIndex(e => e.ComponentId, "component_componentid_uindex")
+                    .IsUnique();
+
+                entity.Property(e => e.ComponentId).HasDefaultValueSql("nextval('\"component_ComponentId_seq\"'::regclass)");
+
+                entity.Property(e => e.Name).IsRequired();
+
+                entity.Property(e => e.Type).IsRequired();
+
+                entity.HasOne(d => d.Task)
+                    .WithMany(p => p.Components)
+                    .HasForeignKey(d => d.TaskId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("component_user_task_taski_fk");
+            });
+
             modelBuilder.Entity<Device>(entity =>
             {
                 entity.ToTable("DEVICE");
@@ -75,6 +97,29 @@ namespace MonitorWebAPI.Models
                 entity.Property(e => e.Location).IsRequired();
 
                 entity.Property(e => e.Name).IsRequired();
+            });
+
+            modelBuilder.Entity<DeviceFile>(entity =>
+            {
+                entity.HasKey(e => e.FileId)
+                    .HasName("device_file_pk");
+
+                entity.ToTable("DEVICE_FILE");
+
+                entity.HasIndex(e => e.FileId, "device_file_fileid_uindex")
+                    .IsUnique();
+
+                entity.Property(e => e.FileId).HasDefaultValueSql("nextval('\"device_file_FileId_seq\"'::regclass)");
+
+                entity.Property(e => e.FileData).IsRequired();
+
+                entity.Property(e => e.TimeStamp).HasColumnType("timestamp with time zone");
+
+                entity.HasOne(d => d.Device)
+                    .WithMany(p => p.DeviceFiles)
+                    .HasForeignKey(d => d.DeviceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("device_file_device_deviceid_fk");
             });
 
             modelBuilder.Entity<DeviceGroup>(entity =>
@@ -203,11 +248,11 @@ namespace MonitorWebAPI.Models
                     .IsRequired()
                     .HasColumnName("URI_link");
 
-                //entity.HasOne(d => d.Report)
-                //    .WithMany(p => p.ReportInstances)
-                //    .HasForeignKey(d => d.ReportId)
-                //    .OnDelete(DeleteBehavior.ClientSetNull)
-                //    .HasConstraintName("report_instances_reports_reportid_fk");
+                entity.HasOne(d => d.Report)
+                    .WithMany(p => p.ReportInstances)
+                    .HasForeignKey(d => d.ReportId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("report_instances_reports_reportid_fk");
             });
 
             modelBuilder.Entity<Role>(entity =>
