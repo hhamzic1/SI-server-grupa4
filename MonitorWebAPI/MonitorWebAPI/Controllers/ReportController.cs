@@ -341,5 +341,40 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
+
+        [HttpPut("/api/report/ChangeSendingEmail/{reportId}")]
+        public async Task<ActionResult<ResponseModel<List<Report>>>> ChangeSendingEmail([FromHeader] string Authorization, int reportId)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+
+                List<Report> allReports = mc.Reports
+                    .Where(x => x.Deleted == false && x.UserId == vu.id)
+                    .ToList();
+
+                var existingReport = allReports.Where(x => x.ReportId == reportId).FirstOrDefault();
+
+                if (existingReport != null)
+                {
+                    existingReport.SendEmail = ! existingReport.SendEmail;
+                    await mc.SaveChangesAsync();
+                }
+
+                return new ResponseModel<List<Report>>() { data = allReports, newAccessToken = vu.accessToken };
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
     }
 }
