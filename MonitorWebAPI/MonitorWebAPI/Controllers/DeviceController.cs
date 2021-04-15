@@ -759,5 +759,44 @@ namespace MonitorWebAPI.Controllers
                 return Unauthorized();
             }
         }
+
+
+        [Route("/api/device/uploadFile")]
+        [HttpPost]
+        public async Task<ActionResult<ResponseModel<List<DeviceFile>>>> FileUpload([FromBody] List<DeviceFileModel> fileModels, [FromHeader]string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                List<DeviceFile> rez = new List<DeviceFile>();
+
+                foreach(var file in fileModels) 
+                {
+                    int deviceId = mc.Devices.Where(x => x.DeviceUid == file.DeviceUID).FirstOrDefault().DeviceId;
+                    var base64 = Convert.FromBase64String(file.FileData);
+                    rez.Add(new DeviceFile()
+                    {
+                        DeviceId = deviceId,
+                        FileData = base64,
+                        TimeStamp = file.TimeStamp,
+                        Name = file.Name,
+                    }); 
+                }
+
+                mc.DeviceFiles.AddRange(rez);
+                await mc.SaveChangesAsync();
+                return new ResponseModel<List<DeviceFile>>() { data = rez, newAccessToken = vu.accessToken };
+
+            }
+            return StatusCode(403);
+        }
     }
 }
