@@ -93,6 +93,7 @@ namespace MonitorWebAPI.Controllers
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
                 List<Report> allReports = mc.Reports.ToList()
+                    .Where(x => x.UserId == vu.id)
                     .Where(x => x.Deleted == false)
                     .ToList();
 
@@ -177,6 +178,7 @@ namespace MonitorWebAPI.Controllers
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
                 List<Report> allReports = mc.Reports
+                    .Where(x => x.UserId == vu.id)
                     .Where(x => x.Deleted == false)
                     .ToList();
 
@@ -258,8 +260,9 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                List<ReportInstance> allReportInstances = mc.ReportInstances
-                    .ToList();
+
+                List<ReportInstance> allReportInstances = mc.ReportInstances.ToList();
+                List<Report> allReports = mc.Reports.Where(x => x.Deleted == false && x.UserId == vu.id).ToList();
 
                 if (!string.IsNullOrEmpty(queryReportInstance.UriLink))
                 {
@@ -276,16 +279,22 @@ namespace MonitorWebAPI.Controllers
 
                 List<ReportInstanceResponseModel> reportList = new List<ReportInstanceResponseModel>();
 
-                foreach (var report in allReportInstances)
-                {
-                    reportList.Add(new ReportInstanceResponseModel()
+                foreach (var reportInst in allReportInstances)
+                    foreach (var report in allReports)
                     {
-                        ReportId = report.ReportId,
-                        Name = report.Name,
-                        UriLink = report.UriLink,
-                        Date = report.Date
-                    });
-                }
+                        if (report.ReportId == reportInst.ReportId)
+                        {
+                            reportList.Add(new ReportInstanceResponseModel()
+                            {
+                                ReportId = reportInst.ReportId,
+                                Name = reportInst.Name,
+                                UriLink = reportInst.UriLink,
+                                Date = reportInst.Date
+                            });
+                            break;
+                        }
+                            
+                    }
 
                 return new ResponseModel<List<ReportInstanceResponseModel>>() { data = reportList, newAccessToken = vu.accessToken };
 
