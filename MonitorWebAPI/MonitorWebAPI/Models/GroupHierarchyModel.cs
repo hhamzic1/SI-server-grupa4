@@ -9,6 +9,7 @@ namespace MonitorWebAPI.Models
     {
         public int? GroupId { get; set; }
         public string Name { get; set; }
+        public int? parentGroupId {get; set;}
         public List<GroupHierarchyModel> SubGroups { get; set; }
         public List<Device> Devices { get; set; } = new List<Device>();
     }

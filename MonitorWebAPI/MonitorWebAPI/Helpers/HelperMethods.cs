@@ -22,7 +22,7 @@ namespace MonitorWebAPI.Helpers
         public GroupHierarchyModel FindHierarchyTree(Models.Group g)
         {
             monitorContext mc = new monitorContext();
-            GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = g.GroupId, Name = g.Name, SubGroups = new List<GroupHierarchyModel>() };
+            GroupHierarchyModel ghm = new GroupHierarchyModel() { GroupId = g.GroupId, parentGroupId=null, Name = g.Name, SubGroups = new List<GroupHierarchyModel>() };
             findSubgroups(ghm, mc);
             return ghm;
         }
@@ -32,7 +32,7 @@ namespace MonitorWebAPI.Helpers
             var tempList = mc.Groups.Where(x => x.ParentGroup == ghm.GroupId);
             foreach(var group in tempList)
             {
-                ghm.SubGroups.Add(new GroupHierarchyModel { GroupId = group.GroupId, Name = group.Name, SubGroups = new List<GroupHierarchyModel>() });
+                ghm.SubGroups.Add(new GroupHierarchyModel { GroupId = group.GroupId, parentGroupId = ghm.GroupId, Name = group.Name, SubGroups = new List<GroupHierarchyModel>() });
             }
             foreach (var tempGhm in ghm.SubGroups)
             {

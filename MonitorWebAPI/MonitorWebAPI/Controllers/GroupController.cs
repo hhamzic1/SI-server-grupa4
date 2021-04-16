@@ -64,7 +64,7 @@ namespace MonitorWebAPI.Controllers
                     var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                     if (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, vu.groupId))
                     {
-                    Models.Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
+                    Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
                         GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
                         return new ResponseModel<GroupHierarchyModel>() { data = ghm, newAccessToken = vu.accessToken };
                     }
