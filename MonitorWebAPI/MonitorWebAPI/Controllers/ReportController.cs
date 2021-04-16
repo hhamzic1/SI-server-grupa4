@@ -78,7 +78,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/report/GetReports")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> GetReports([FromHeader] string Authorization, [FromQuery] ReportResponseModel queryReport)
+        public async Task<ActionResult<ResponseModel<List<Report>>>> GetReports([FromHeader] string Authorization, [FromQuery] ReportResponseModel queryReport)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -117,23 +117,8 @@ namespace MonitorWebAPI.Controllers
                     allReports = allReports.Where(x => x.UserId == queryReport.UserId).ToList();
                 }
 
-                List<ReportResponseModel> reportList = new List<ReportResponseModel>();
 
-                foreach (var report in allReports)
-                {
-                    reportList.Add(new ReportResponseModel()
-                    {
-                        ReportId = report.ReportId,
-                        Name = report.Name,
-                        Query = report.Query,
-                        Frequency = report.Frequency,
-                        ReportInstances = mc.ReportInstances.Where(x => x.ReportId == report.ReportId).ToList(),
-                        NextDate = report.NextDate,
-                        UserId = vu.id
-                    });
-                }
-
-                return new ResponseModel<List<ReportResponseModel>>() { data = reportList, newAccessToken = vu.accessToken };
+                return new ResponseModel<List<Report>>() { data = allReports, newAccessToken = vu.accessToken };
 
             }
             else
@@ -144,7 +129,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/report/CreateReport")]
         [HttpPost]
-        public async Task<ActionResult<ResponseModel<ReportResponseModel>>> CreateReport([FromHeader] string Authorization, [FromBody] Report report)
+        public async Task<ActionResult<ResponseModel<Report>>> CreateReport([FromHeader] string Authorization, [FromBody] Report report)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -161,23 +146,8 @@ namespace MonitorWebAPI.Controllers
                     report.User = mc.Users.Where(x => x.UserId == vu.id).FirstOrDefault();
                     mc.Reports.Add(report);
                     await mc.SaveChangesAsync();
-                    ReportResponseModel tempReport = new ReportResponseModel()
-                    {
-                        ReportId = report.ReportId,
-                        Name = report.Name,
-                        Query = report.Query,
-                        Frequency = report.Frequency,
-                        ReportInstances = mc.ReportInstances.Where(x => x.ReportId == report.ReportId).ToList(),
-                        NextDate = report.NextDate,
-                        UserId = vu.id
-                    };
 
-                    if (tempReport != null)
-                    {
-                        await mc.SaveChangesAsync();
-                        return new ResponseModel<ReportResponseModel>() { data = tempReport, newAccessToken = vu.accessToken };
-                    }
-                    throw new Exception("Report wasn't added succesfully");
+                    return new ResponseModel<Report>() { data = report, newAccessToken = vu.accessToken };
 
                 }
                 catch (Exception e)
@@ -193,7 +163,7 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/report/StopReport/{reportId}")]
         [HttpPatch]
-        public async Task<ActionResult<ResponseModel<List<ReportResponseModel>>>> StopReport([FromHeader] string Authorization, int reportId)
+        public async Task<ActionResult<ResponseModel<List<Report>>>> StopReport([FromHeader] string Authorization, int reportId)
         {
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
@@ -217,23 +187,8 @@ namespace MonitorWebAPI.Controllers
                     existingReport.Deleted = true;
                     await mc.SaveChangesAsync();
                 }
-                List<ReportResponseModel> reportList = new List<ReportResponseModel>();
 
-                foreach (var report in allReports)
-                {
-                    reportList.Add(new ReportResponseModel()
-                    {
-                        ReportId = report.ReportId,
-                        Name = report.Name,
-                        Query = report.Query,
-                        Frequency = report.Frequency,
-                        ReportInstances = mc.ReportInstances.Where(x => x.ReportId == report.ReportId).ToList(),
-                        NextDate = report.NextDate,
-                        UserId = vu.id,
-                    });
-                }
-
-                return new ResponseModel<List<ReportResponseModel>>() { data = reportList, newAccessToken = vu.accessToken };
+                return new ResponseModel<List<Report>>() { data = allReports, newAccessToken = vu.accessToken };
             }
             else
             {
@@ -365,6 +320,44 @@ namespace MonitorWebAPI.Controllers
                 if (existingReport != null)
                 {
                     existingReport.SendEmail = ! existingReport.SendEmail;
+                    await mc.SaveChangesAsync();
+                }
+
+                return new ResponseModel<List<Report>>() { data = allReports, newAccessToken = vu.accessToken };
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpPut("/api/report/EditReport")]
+        public async Task<ActionResult<ResponseModel<List<Report>>>> EditReport([FromHeader] string Authorization, [FromBody] Report report)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+
+                List<Report> allReports = mc.Reports
+                    .Where(x => x.Deleted == false && x.UserId == vu.id)
+                    .ToList();
+
+                var existingReport = allReports.Where(x => x.ReportId == report.ReportId).FirstOrDefault();
+
+                if (existingReport != null)
+                {
+                    existingReport.Name = report.Name;
+                    existingReport.Frequency = report.Frequency;
+                    existingReport.NextDate = report.NextDate;
+                    existingReport.Query = report.Query;
+                    existingReport.SendEmail = report.SendEmail;
                     await mc.SaveChangesAsync();
                 }
 
