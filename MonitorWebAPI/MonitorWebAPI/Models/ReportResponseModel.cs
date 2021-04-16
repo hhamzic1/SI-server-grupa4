@@ -10,6 +10,8 @@ namespace MonitorWebAPI.Models
         public string Query { get; set; }
         public string Frequency { get; set; }
         public DateTime NextDate { get; set; }
+        public bool? SendEmail { get; set; }
+        public bool? Deleted { get; set; }
         public int UserId { get; set; }
         public ICollection<ReportInstance> ReportInstances { get; set; }
     }
