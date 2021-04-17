@@ -42,6 +42,7 @@ namespace MonitorWebAPI.Controllers
                 var tasks = await mc.UserTasks.Where(t => t.UserId == vu.id).ToListAsync();
                 foreach (UserTask task in tasks)
                 {
+                    task.UserTrackers = mc.UserTrackers.Where(ut => ut.UserTaskId == task.TaskId).ToList();
                     if (task.DeviceId != null)
                     {
                         task.Device = await mc.Devices.FindAsync(task.DeviceId);
@@ -77,12 +78,13 @@ namespace MonitorWebAPI.Controllers
                 }
                 else if (userTask.UserId != vu.id)
                 {
-                    return Unauthorized();
+                    return Forbid();
                 }
                 else if (userTask.DeviceId != null)
                 {
                     userTask.Device = await mc.Devices.FindAsync(userTask.DeviceId);
                 }
+                userTask.UserTrackers = mc.UserTrackers.Where(ut => ut.UserTaskId == userTask.TaskId).ToList();
 
                 return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
             }
@@ -204,7 +206,7 @@ namespace MonitorWebAPI.Controllers
                 }
                 else if (userTask.UserId != vu.id)
                 {
-                    return Unauthorized();
+                    return Forbid();
                 }
 
                 mc.UserTasks.Remove(userTask);
@@ -255,7 +257,7 @@ namespace MonitorWebAPI.Controllers
                     }
                     else
                     {
-                        return Unauthorized();
+                        return Forbid();
                     }
                 }
                 catch(NullReferenceException e)
@@ -357,6 +359,7 @@ namespace MonitorWebAPI.Controllers
                         user.UserTasks = await mc.UserTasks.Where(t => t.UserId == user.UserId).ToListAsync();
                         foreach (UserTask task in user.UserTasks)
                         {
+                            task.UserTrackers = mc.UserTrackers.Where(ut => ut.UserTaskId == task.TaskId).ToList();
                             if (task.DeviceId != null)
                             {
                                 task.Device = await mc.Devices.FindAsync(task.DeviceId);
@@ -369,7 +372,7 @@ namespace MonitorWebAPI.Controllers
                 }
                 else
                 {
-                    return Unauthorized();
+                    return Forbid();
                 }
             }
             else
@@ -397,6 +400,7 @@ namespace MonitorWebAPI.Controllers
                     var tasks = await mc.UserTasks.Where(t => t.UserId == id).ToListAsync();
                     foreach (UserTask task in tasks)
                     {
+                        task.UserTrackers = mc.UserTrackers.Where(ut => ut.UserTaskId == task.TaskId).ToList();
                         if (task.DeviceId != null)
                         {
                             task.Device = await mc.Devices.FindAsync(task.DeviceId);
@@ -407,7 +411,7 @@ namespace MonitorWebAPI.Controllers
                 }
                 else
                 {
-                    return Unauthorized();
+                    return Forbid();
                 }
             }
             else
