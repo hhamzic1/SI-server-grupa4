@@ -683,8 +683,10 @@ namespace MonitorWebAPI.Controllers
                                         webSocketUrl = cjson.webSocketUrl,
                                         pingUri = cjson.pingUri,
                                         mainUri = cjson.mainUri,
+                                        errorUri= cjson.errorUri,
                                         fileUri = cjson.fileUri,
                                         installationCode = device.InstallationCode,
+                                        path= cjson.path,
                                         fileLocations = new ConfigJS.FileLocations()
                                         {
                                             File1 = paths.File1,
@@ -706,15 +708,17 @@ namespace MonitorWebAPI.Controllers
                                         webSocketUrl = "si-grupa5.herokuapp.com",
                                         pingUri = "https://si-2021.167.99.244.168.nip.io:3000/liveStatus",
                                         mainUri = "https://si-2021.167.99.244.168.nip.io/api/device/GetDeviceByInstallationCode/",
-                                        fileUri = "https://si-2021.167.99.244.168.nip.io:3000/errorLog",
+                                        errorUri= "https://si-2021.167.99.244.168.nip.io:3000/errorLog",
+                                        fileUri = "https://si-2021.167.99.244.168.nip.io/api/device/uploadFile",
                                         installationCode = device.InstallationCode,
+                                        path= "C:\\Program Files",
                                         fileLocations = new ConfigJS.FileLocations()
                                         {
-                                            File1 = "",
-                                            File2 = "",
-                                            File3 = "",
-                                            File4 = "",
-                                            File5 = ""
+                                            File1 = new ConfigJS.FileInfo() {path="", minutes=0 },
+                                            File2 = new ConfigJS.FileInfo() { path = "", minutes = 0 },
+                                            File3 = new ConfigJS.FileInfo() { path = "", minutes = 0 },
+                                            File4 = new ConfigJS.FileInfo() { path = "", minutes = 0 },
+                                            File5 = new ConfigJS.FileInfo() { path = "", minutes = 0 }
                                         }
                                     };
                                 }

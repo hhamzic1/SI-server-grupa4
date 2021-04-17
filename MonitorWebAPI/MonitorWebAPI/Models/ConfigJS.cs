@@ -16,18 +16,30 @@ namespace MonitorWebAPI.Models
         public string pingUri { get; set; }
         public string mainUri { get; set; }
 
+        public string errorUri { get; set; }
+
         public string fileUri { get; set; }
 
         public string installationCode { get; set; }
+        public string path { get; set; }
+
+        public class FileInfo 
+        {
+            public string path { get; set; }
+            public int minutes { get; set; }
+
+        }
 
         public class FileLocations
         {
-            public string File1 { get; set; }
-            public string File2 { get; set; }
-            public string File3 { get; set; }
-            public string File4 { get; set; }
-            public string File5 { get; set; }
+            public FileInfo File1 { get; set; }
+            public FileInfo File2 { get; set; }
+            public FileInfo File3 { get; set; }
+            public FileInfo File4 { get; set; }
+            public FileInfo File5 { get; set; }
         }
+
+
         public FileLocations fileLocations { get; set; }
 
     }
