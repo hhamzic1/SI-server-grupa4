@@ -781,11 +781,10 @@ namespace MonitorWebAPI.Controllers
                 foreach(var file in fileModels) 
                 {
                     int deviceId = mc.Devices.Where(x => x.DeviceUid == file.DeviceUID).FirstOrDefault().DeviceId;
-                    var base64 = Convert.FromBase64String(file.FileData);
                     rez.Add(new DeviceFile()
                     {
                         DeviceId = deviceId,
-                        FileData = base64,
+                        FileData = Encoding.ASCII.GetBytes(file.FileData),
                         TimeStamp = file.TimeStamp,
                         Name = file.Name,
                     }); 
@@ -793,7 +792,7 @@ namespace MonitorWebAPI.Controllers
 
                 mc.DeviceFiles.AddRange(rez);
                 await mc.SaveChangesAsync();
-                return new ResponseModel<List<DeviceFile>>() { data = rez, newAccessToken = vu.accessToken };
+                return StatusCode(200, "Successfully uploaded into database");
 
             }
             return StatusCode(403);
