@@ -47,6 +47,44 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
+        [Route("/api/group/GetAllGroups")]
+        [HttpGet]
+        public async Task<ActionResult<ResponseModel<List<GroupHierarchyModel>>>> GetAllGroups([FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
+                if (userRoleName == "MonitorSuperAdmin")
+                {
+                    List<Group> topGroups = mc.Groups.Where(x => x.ParentGroup == null).ToList();
+                    List<GroupHierarchyModel> allHierarchy = new List<GroupHierarchyModel>();
+                    foreach (Group topGroup in topGroups)
+                    {
+                        GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(topGroup);
+                        allHierarchy.Add(ghm);
+                    }
+                    return new ResponseModel<List<GroupHierarchyModel>>() { data = allHierarchy, newAccessToken = vu.accessToken };
+                }
+                else
+                {
+                    return StatusCode(403);
+                }
+            }
+            else
+            {
+                return Unauthorized("Token not valid");
+            }
+        }
+
+
         [Route("/api/group/MyAssignedGroups")]
         [HttpGet]
         public async Task<ActionResult<ResponseModel<GroupHierarchyModel>>> MyAssignedGroups([FromHeader] string Authorization)
@@ -64,7 +102,7 @@ namespace MonitorWebAPI.Controllers
                     var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                     if (userRoleName == "SuperAdmin" && helperMethod.CheckIfGroupBelongsToUsersTree(vu, vu.groupId))
                     {
-                    Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
+                        Group g = mc.Groups.Where(x => x.GroupId == vu.groupId).FirstOrDefault();
                         GroupHierarchyModel ghm = helperMethod.FindHierarchyTree(g);
                         return new ResponseModel<GroupHierarchyModel>() { data = ghm, newAccessToken = vu.accessToken };
                     }
