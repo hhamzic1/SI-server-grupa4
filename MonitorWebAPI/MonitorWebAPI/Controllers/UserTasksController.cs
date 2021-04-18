@@ -94,6 +94,47 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
+        // GET: api/UserTasks/5
+        [HttpGet("Admin/{id}")]
+        public async Task<ActionResult<ResponseModel<UserTask>>> GetAdminUserTask(int id, [FromHeader] string Authorization)
+        {
+            string JWT = JWTVerify.GetToken(Authorization);
+            if (JWT == null)
+            {
+                return Unauthorized();
+            }
+            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string responseBody = await response.Content.ReadAsStringAsync();
+                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
+                if (mc.Roles.Find(vu.roleId).Name == "MonitorSuperAdmin")
+                {
+                    var userTask = await mc.UserTasks.FindAsync(id);
+
+                    if (userTask == null)
+                    {
+                        return NotFound();
+                    }
+                    else if (userTask.DeviceId != null)
+                    {
+                        userTask.Device = await mc.Devices.FindAsync(userTask.DeviceId);
+                    }
+                    userTask.UserTrackers = mc.UserTrackers.Where(ut => ut.UserTaskId == userTask.TaskId).ToList();
+
+                    return new ResponseModel<UserTask>() { data = userTask, newAccessToken = vu.accessToken };
+                }
+                else
+                {
+                    return Forbid();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
         // PUT: api/UserTasks/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
