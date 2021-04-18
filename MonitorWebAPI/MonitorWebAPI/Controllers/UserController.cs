@@ -107,13 +107,16 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 var users = mc.Users
-                     .Select(x => new {
+                     .Select(x => new
+                     {
                          x.Name,
                          x.Lastname,
                          x.Email,
                          x.UserId,
                          x.Phone,
-                         x.Address
+                         x.RoleId,
+                         x.Address,
+                         groupId = (from uGroup in mc.UserGroups where uGroup.UserId == x.UserId select uGroup.GroupId).ToList()
                      });
                 return new ResponseModel<IQueryable>() { data = users, newAccessToken = vu.accessToken };
             }
