@@ -613,7 +613,6 @@ namespace MonitorWebAPI.Controllers
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                string username = mc.Users.First(x => x.UserId == vu.id).Name;
                 var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                 Device device = mc.Devices.Where(x => x.DeviceUid == newDevice.DeviceUid).FirstOrDefault();
 
@@ -657,7 +656,7 @@ namespace MonitorWebAPI.Controllers
                                 
                             }
                         }
-                        HttpResponseMessage configFileResponse = HelperMethods.GetConfigFile(JWT, newDevice.DeviceUid, "config.json", username).Result;
+                        HttpResponseMessage configFileResponse = HelperMethods.GetConfigFile(JWT, newDevice.DeviceUid, "config.json").Result;
                         if (configFileResponse.IsSuccessStatusCode)
                         {
                             try
@@ -683,8 +682,10 @@ namespace MonitorWebAPI.Controllers
                                         webSocketUrl = cjson.webSocketUrl,
                                         pingUri = cjson.pingUri,
                                         mainUri = cjson.mainUri,
+                                        errorUri= cjson.errorUri,
                                         fileUri = cjson.fileUri,
                                         installationCode = device.InstallationCode,
+                                        path= cjson.path,
                                         fileLocations = new ConfigJS.FileLocations()
                                         {
                                             File1 = paths.File1,
@@ -706,21 +707,23 @@ namespace MonitorWebAPI.Controllers
                                         webSocketUrl = "si-grupa5.herokuapp.com",
                                         pingUri = "https://si-2021.167.99.244.168.nip.io:3000/liveStatus",
                                         mainUri = "https://si-2021.167.99.244.168.nip.io/api/device/GetDeviceByInstallationCode/",
-                                        fileUri = "https://si-2021.167.99.244.168.nip.io:3000/errorLog",
+                                        errorUri= "https://si-2021.167.99.244.168.nip.io:3000/errorLog",
+                                        fileUri = "https://si-2021.167.99.244.168.nip.io/api/device/uploadFile",
                                         installationCode = device.InstallationCode,
+                                        path= "C:\\Program Files",
                                         fileLocations = new ConfigJS.FileLocations()
                                         {
-                                            File1 = "",
-                                            File2 = "",
-                                            File3 = "",
-                                            File4 = "",
-                                            File5 = ""
+                                            File1 = new ConfigJS.FileInfo() {path="", minutes=0 },
+                                            File2 = new ConfigJS.FileInfo() { path = "", minutes = 0 },
+                                            File3 = new ConfigJS.FileInfo() { path = "", minutes = 0 },
+                                            File4 = new ConfigJS.FileInfo() { path = "", minutes = 0 },
+                                            File5 = new ConfigJS.FileInfo() { path = "", minutes = 0 }
                                         }
                                     };
                                 }
                                 var jsonData = JsonConvert.SerializeObject(config);
                                 string base64EncodedExternalAccount = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonData));
-                                HttpResponseMessage configFileResponse2 = HelperMethods.PostConfigFile(JWT, newDevice.DeviceUid, "config.json", username, base64EncodedExternalAccount).Result;
+                                HttpResponseMessage configFileResponse2 = HelperMethods.PostConfigFile(JWT, newDevice.DeviceUid, "config.json", base64EncodedExternalAccount).Result;
                                 if (configFileResponse2.IsSuccessStatusCode)
                                 {
                                     if ((int)configFileResponse2.StatusCode == 210)
@@ -763,22 +766,13 @@ namespace MonitorWebAPI.Controllers
 
         [Route("/api/device/uploadFile")]
         [HttpPost]
-        public async Task<ActionResult<ResponseModel<List<DeviceFile>>>> FileUpload([FromBody] List<DeviceFileModel> fileModels, [FromHeader]string Authorization)
+        public async Task<ActionResult<ResponseModel<List<DeviceFile>>>> FileUpload([FromBody] List<DeviceFileModel> fileModels)
         {
-            string JWT = JWTVerify.GetToken(Authorization);
-            if (JWT == null)
+            try
             {
-                return Unauthorized();
-            }
-            HttpResponseMessage response = JWTVerify.VerifyJWT(JWT).Result;
-
-            if (response.IsSuccessStatusCode)
-            {
-                string responseBody = await response.Content.ReadAsStringAsync();
-                VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 List<DeviceFile> rez = new List<DeviceFile>();
 
-                foreach(var file in fileModels) 
+                foreach (var file in fileModels)
                 {
                     int deviceId = mc.Devices.Where(x => x.DeviceUid == file.DeviceUID).FirstOrDefault().DeviceId;
                     rez.Add(new DeviceFile()
@@ -787,15 +781,17 @@ namespace MonitorWebAPI.Controllers
                         FileData = Encoding.ASCII.GetBytes(file.FileData),
                         TimeStamp = file.TimeStamp,
                         Name = file.Name,
-                    }); 
+                    });
                 }
 
                 mc.DeviceFiles.AddRange(rez);
                 await mc.SaveChangesAsync();
                 return StatusCode(200, "Successfully uploaded into database");
-
             }
-            return StatusCode(403);
+            catch
+            {
+                return StatusCode(403, "File not uploaded");
+            }
         }
     }
 }
