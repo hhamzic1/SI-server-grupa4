@@ -94,9 +94,10 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/user/GetAllUsers")]
         [HttpGet]
-        public async Task<ActionResult<ResponseModel<IQueryable>>> GetAllUsers([FromHeader] string Authorization)
+        public async Task<ActionResult<ResponseModel<UserPagingModel>>> GetAllUsers([FromHeader] string Authorization, [FromQuery] bool? enable_pagination, [FromQuery] int? page, [FromQuery] int? per_page, [FromQuery] string? name, [FromQuery] string? last_name, [FromQuery] string? email, [FromQuery] string? adress, [FromQuery] string? sort_by)
         {
             string JWT = JWTVerify.GetToken(Authorization);
+            bool parsedEP = enable_pagination == null ? false : (bool)enable_pagination;
             if (JWT == null)
             {
                 return Unauthorized();
@@ -107,18 +108,72 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
                 var users = mc.Users
-                     .Select(x => new
-                     {
-                         x.Name,
-                         x.Lastname,
-                         x.Email,
-                         x.UserId,
-                         x.Phone,
-                         x.RoleId,
-                         x.Address,
-                         groupId = (from uGroup in mc.UserGroups where uGroup.UserId == x.UserId select uGroup.GroupId).ToList()
-                     });
-                return new ResponseModel<IQueryable>() { data = users, newAccessToken = vu.accessToken };
+                         .Select(x => new
+                         {
+                             x.Name,
+                             x.Lastname,
+                             x.Email,
+                             x.UserId,
+                             x.Phone,
+                             x.Address,
+                             groupId = (from uGroup in mc.UserGroups where uGroup.UserId == x.UserId select uGroup.GroupId).ToList()
+                         });
+                if (!parsedEP)
+                {
+                    return new ResponseModel<UserPagingModel>() { data = new UserPagingModel { users = users, userCount = users.ToArray().Length }, newAccessToken = vu.accessToken };
+                }
+                else
+                {
+                    int parsedPage = page == null ? 1 : (int)page;
+                    int parsedPerPage = per_page == null ? 10 : (int)per_page;
+                    int skip = (parsedPage - 1) * parsedPerPage;
+                    string parsedName = name == null ? "" : name;
+                    string parsedLastName = last_name == null ? "" : last_name;
+                    string parsedEmail = email == null ? "" : email;
+                    string parsedAdress = adress == null ? "" : adress;
+                    string parsedSortBy = sort_by == null ? "" : sort_by;
+                    var filteredList = users;
+                    if (name != null || last_name != null || email != null || adress != null)
+                    {
+                        filteredList = filteredList.Where(x => (name != null && x.Name.ToLower().Contains(parsedName.ToLower()))
+                                                            || (last_name != null && x.Lastname.ToLower().Contains(parsedLastName.ToLower()))
+                                                            || (email != null && x.Email.ToLower().Contains(parsedEmail.ToLower()))
+                                                            || (adress != null && x.Address.ToLower().Contains(parsedAdress.ToLower())));
+                    }
+                    switch (parsedSortBy)
+                    {
+                        case "name_asc":
+                            filteredList = filteredList.OrderBy(x => x.Name);
+                            break;
+                        case "name_desc":
+                            filteredList = filteredList.OrderByDescending(x => x.Name);
+                            break;
+                        case "lastname_asc":
+                            filteredList = filteredList.OrderBy(x => x.Lastname);
+                            break;
+                        case "lastname_desc":
+                            filteredList = filteredList.OrderByDescending(x => x.Lastname);
+                            break;
+                        case "email_asc":
+                            filteredList = filteredList.OrderBy(x => x.Email);
+                            break;
+                        case "email_desc":
+                            filteredList = filteredList.OrderByDescending(x => x.Email);
+                            break;
+                        case "adress_asc":
+                            filteredList = filteredList.OrderBy(x => x.Address);
+                            break;
+                        case "adress_desc":
+                            filteredList = filteredList.OrderByDescending(x => x.Address);
+                            break;
+                        default:
+                            filteredList = filteredList.OrderBy(x => x.UserId);
+                            break;
+                    }
+                    int userCount = filteredList.ToArray().Length;
+                    filteredList = filteredList.Skip(skip).Take(parsedPerPage);
+                    return new ResponseModel<UserPagingModel>() { data = new UserPagingModel { users = filteredList, userCount = userCount }, newAccessToken = vu.accessToken };
+                }
             }
             else
             {
