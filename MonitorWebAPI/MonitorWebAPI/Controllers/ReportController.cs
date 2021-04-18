@@ -410,11 +410,7 @@ namespace MonitorWebAPI.Controllers
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
 
-                List<Report> allReports = mc.Reports
-                    .Where(x => x.Deleted == false && x.UserId == vu.id)
-                    .ToList();
-
-                var existingReport = allReports.Where(x => x.ReportId == report.ReportId).FirstOrDefault();
+                var existingReport = mc.Reports.Where(x => x.ReportId == report.ReportId).FirstOrDefault();
 
                 if (existingReport != null)
                 {
@@ -425,6 +421,10 @@ namespace MonitorWebAPI.Controllers
                     existingReport.SendEmail = report.SendEmail;
                     await mc.SaveChangesAsync();
                 }
+
+                List<Report> allReports = mc.Reports
+                    .Where(x => x.Deleted == false && x.UserId == vu.id)
+                    .ToList();
 
                 List<ReportResponseModel> reportList = new List<ReportResponseModel>();
 
