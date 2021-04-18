@@ -257,7 +257,7 @@ namespace MonitorWebAPI.Helpers
             return deviceList;
         }
 
-        public static async Task<HttpResponseMessage> GetConfigFile(string JWT, Guid deviceUID, string fileName, string username)
+        public static async Task<HttpResponseMessage> GetConfigFile(string JWT, Guid deviceUID, string fileName)
         {
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWT);
@@ -265,7 +265,7 @@ namespace MonitorWebAPI.Helpers
 
             var values = new Dictionary<string, string>
             {
-                {"deviceUid", deviceUID.ToString()}, {"fileName", fileName}, {"path", ""}, {"user", username}
+                {"deviceUid", deviceUID.ToString()}, {"fileName", fileName}, {"path", ""}
             };
             var content = JsonConvert.SerializeObject(values, Formatting.Indented);
 
@@ -273,14 +273,14 @@ namespace MonitorWebAPI.Helpers
             return await client.PostAsync("https://si-grupa5.herokuapp.com/api/web/agent/file/get", data);
         }
 
-        public static async Task<HttpResponseMessage> PostConfigFile(string JWT, Guid deviceUID, string fileName, string username, string base64)
+        public static async Task<HttpResponseMessage> PostConfigFile(string JWT, Guid deviceUID, string fileName, string base64)
         {
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWT);
 
             var values = new Dictionary<string, string>
             {
-                {"deviceUid", deviceUID.ToString()}, {"fileName", fileName}, {"path", ""}, {"base64", base64}, {"user", username}
+                {"deviceUid", deviceUID.ToString()}, {"fileName", fileName}, {"path", ""}, {"base64", base64}
             };
             var content = JsonConvert.SerializeObject(values, Formatting.Indented);
 

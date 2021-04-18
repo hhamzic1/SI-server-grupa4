@@ -613,7 +613,6 @@ namespace MonitorWebAPI.Controllers
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 VerifyUserModel vu = JsonConvert.DeserializeObject<VerifyUserModel>(responseBody);
-                string username = mc.Users.First(x => x.UserId == vu.id).Name;
                 var userRoleName = mc.Roles.Where(x => x.RoleId == vu.roleId).FirstOrDefault().Name;
                 Device device = mc.Devices.Where(x => x.DeviceUid == newDevice.DeviceUid).FirstOrDefault();
 
@@ -657,7 +656,7 @@ namespace MonitorWebAPI.Controllers
                                 
                             }
                         }
-                        HttpResponseMessage configFileResponse = HelperMethods.GetConfigFile(JWT, newDevice.DeviceUid, "config.json", username).Result;
+                        HttpResponseMessage configFileResponse = HelperMethods.GetConfigFile(JWT, newDevice.DeviceUid, "config.json").Result;
                         if (configFileResponse.IsSuccessStatusCode)
                         {
                             try
@@ -724,7 +723,7 @@ namespace MonitorWebAPI.Controllers
                                 }
                                 var jsonData = JsonConvert.SerializeObject(config);
                                 string base64EncodedExternalAccount = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonData));
-                                HttpResponseMessage configFileResponse2 = HelperMethods.PostConfigFile(JWT, newDevice.DeviceUid, "config.json", username, base64EncodedExternalAccount).Result;
+                                HttpResponseMessage configFileResponse2 = HelperMethods.PostConfigFile(JWT, newDevice.DeviceUid, "config.json", base64EncodedExternalAccount).Result;
                                 if (configFileResponse2.IsSuccessStatusCode)
                                 {
                                     if ((int)configFileResponse2.StatusCode == 210)
