@@ -116,6 +116,7 @@ namespace MonitorWebAPI.Controllers
                              x.UserId,
                              x.Phone,
                              x.Address,
+                             x.RoleId,
                              groupId = (from uGroup in mc.UserGroups where uGroup.UserId == x.UserId select uGroup.GroupId).ToList()
                          });
                 if (!parsedEP)
