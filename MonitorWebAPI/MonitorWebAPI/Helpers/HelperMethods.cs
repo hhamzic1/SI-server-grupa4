@@ -210,8 +210,10 @@ namespace MonitorWebAPI.Helpers
 
             foreach (var rep in reports)
             {
-                
-                if (TimeZoneInfo.ConvertTimeToUtc(rep.NextDate).Equals(dateTime))
+                DateTime dateToCompare = new DateTime(rep.NextDate.Year, rep.NextDate.Month, rep.NextDate.Day, rep.NextDate.Hour, 0, 0);
+                int res = DateTime.Compare(dateTime, TimeZoneInfo.ConvertTimeToUtc(dateToCompare));
+
+                if (res == 0)
                 {
                     string linkToAzure = "";
 
