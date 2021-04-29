@@ -37,6 +37,10 @@ Sprint 4:
     * Kao korisnik želim da se omogući pregled mojih loggova na određenoj mašini
     * Kao korisnik želim da se omogući pregled loggova određenog korisnika na određenoj mašini
 
+Sprint 4:
+
+    * Kao korisnik želim da se omogući paginacija pri pregledu korisnika
+
 ## Rute za zahtjeve
 
 ### Rute za korisnika
@@ -57,7 +61,7 @@ Sprint 4:
 
   [HttpGet]
   
-  * Vraća osnovne informacije o svim korisnicima
+  * Vraća osnovne informacije o svim korisnicima uz dodatu mogucnost paginacije
 
 * [Route("api/user/All")]
 
@@ -131,6 +135,12 @@ Sprint 4:
   [HttpGet]
 
    * Vraća grupu kojoj logovani korisnik pripada, ako korisnik nije logovan vraća se Unathorized()
+
+ [Route("api/group/GetAllGroups")]
+
+  [HttpGet]
+
+   * Vraća sve grupe ukoliko je logovani korisnik MonitorSuperAdmin u suprotnom vraća se Unathorized()
 
 * [Route("/api/group/MyAssignedGroups")]
 
