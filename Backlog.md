@@ -62,7 +62,8 @@ Pagination for users
 App must provide possibility for pagination of users  
 #### Task
 - Create a new branch and switch to it
-- Create route for device user pagination
+- Create route for viewing all groups if the user is MonitorSuperAdmin
+- Update route api/user/GetAllUsers to enable pagination
 - Commit and push on your branch
 - Create a pull request
 - Merge branches
