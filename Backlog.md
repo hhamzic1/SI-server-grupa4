@@ -55,3 +55,14 @@ App must provide the ability to save command logs to the database and then viewi
 - Commit and push on your branch
 - Create a pull request
 - Merge branches
+
+## Feature 
+Pagination for users
+### Item
+App must provide possibility for pagination of users  
+#### Task
+- Create a new branch and switch to it
+- Create route for device user pagination
+- Commit and push on your branch
+- Create a pull request
+- Merge branches
