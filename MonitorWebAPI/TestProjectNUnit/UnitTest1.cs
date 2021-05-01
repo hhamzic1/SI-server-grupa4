@@ -40,14 +40,14 @@ namespace TestProjectNUnit
         }
 
         [Test]
-        public async System.Threading.Tasks.Task Test1Async()
+        public async System.Threading.Tasks.Task TestGetAllDevicesWithAuth()
         {
             var controller = new DeviceController();
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             var result = await controller.GetAllDevices(Authorization: token);
             Assert.NotNull(result);
-            Assert.Pass();
+            Assert.IsInstanceOf<ResponseModel<List<Device>>>(result.Value);
         }
 
         [Test]
@@ -55,8 +55,8 @@ namespace TestProjectNUnit
         {
             var controller = new DeviceController();
             var result = await controller.GetAllDevices(Authorization: token2);
-            //assert
             Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<Device>>>(result.Value);
         }
 
         [Test]
@@ -70,11 +70,11 @@ namespace TestProjectNUnit
             var per_page = 1;
             string name = null;
             var status = "active";
-            int? groupId = 0;
+            int? groupId = null;
             var sort_by = "ascending";
             string location = null;
             var result = await controller.AllDevicesForUser(page, per_page, name, status, groupId, sort_by, location, Authorization: token);
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<ResponseModel<DevicePagingModel>>(result.Value);
         }
 
         [Test]
@@ -90,11 +90,48 @@ namespace TestProjectNUnit
             var status = "active";
             int? groupId = 17;
             var sort_by = "name_asc";
-            string location = null;
+            string location = "sarajevo";
             var result = await controller.AllDevicesForUser(page, per_page, name, status, groupId, sort_by, location, Authorization: token);
             Assert.IsNotNull(result.Value);
+
         }
 
+        [Test]
+
+        public async Task GetAllDevicesForUserAsync3()
+        {
+
+
+            var controller = new DeviceController();
+            var page = 1;
+            var per_page = 1;
+            string name = null;
+            var status = "active";
+            int? groupId = 17;
+            var sort_by = "name_asc";
+            string location = "sarajevo";
+            var result = await controller.AllDevicesForUser(page, per_page, name, status, groupId, sort_by, location, Authorization: token2);
+            Assert.IsNotNull(result.Value);
+
+        }
+
+        [Test]
+
+        public async Task GetAllDevicesForUserAsync4()
+        {
+
+
+            var controller = new DeviceController();
+            var page = 1;
+            var per_page = 1;
+            string name = null;
+            var status = "active";
+            int? groupId = null;
+            var sort_by = "ascending";
+            string location = null;
+            var result = await controller.AllDevicesForUser(page, per_page, name, status, groupId, sort_by, location, Authorization: token2);
+            Assert.IsInstanceOf<ResponseModel<DevicePagingModel>>(result.Value);
+        }
 
         [Test]
 
@@ -131,11 +168,12 @@ namespace TestProjectNUnit
             var response = controller.ControllerContext.HttpContext.Response;
             var result = await controller.CheckIfDeviceBelongsToUser(Authorization: token, uid);
             Assert.NotNull(result);
+            Assert.AreEqual(200, response.StatusCode);
         }
 
         [Test]
 
-        public async Task CheckIfDeviceBelongsToUserNulltoken()
+        public async Task CheckIfDeviceBelongsToUserNullToken()
         {
 
             var controller = new DeviceController();
@@ -161,7 +199,6 @@ namespace TestProjectNUnit
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             var result = await controller.GetDeviceLogs(Authorization: token, 17, null, null);
             Assert.NotNull(result.Value);
-
         }
 
         [Test]
@@ -226,12 +263,31 @@ namespace TestProjectNUnit
         }
 
         [Test]
+        public async Task AllDevicesForGroupWithAuth2()
+        {
+
+            var controller = new DeviceController();
+            var page = 1;
+            var per_page = 1;
+            var name = "";
+            var status = "active";
+            var groupId = 1;
+            var sort_by = "name_asc";
+            var location = "sarajevo";
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            var result = await controller.AllDevicesForGroup(page, per_page, name, status, groupId, sort_by, location, Authorization: token2);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<DevicePagingModel>>(result.Value);
+        }
+
+        [Test]
 
         public async Task MyGroupUnauthorized()
         {
             var controller = new GroupController();
-            string token = "";
-            var result = await controller.MyGroup(Authorization: token);
+            string pomToken = "";
+            var result = await controller.MyGroup(Authorization: pomToken);
             Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
         }
 
@@ -276,7 +332,7 @@ namespace TestProjectNUnit
 
         [Test]
 
-        public async Task GetallGroupsWithAuth()
+        public async Task GetAllGroupsWithAuth()
         {
             var controller = new GroupController();
             var result = await controller.GetAllGroups(Authorization: token2);
@@ -321,7 +377,7 @@ namespace TestProjectNUnit
         public async Task GroupTreeAuthInvalidGroup()
         {
             var controller = new GroupController();
-            var result = await controller.GroupTree(Authorization: token2, 256);
+            var result = await controller.GroupTree(Authorization: token2, 25658564);
             Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
         }
 
