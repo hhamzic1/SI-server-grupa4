@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+/*using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MonitorWebAPI.Controllers;
@@ -20,6 +20,7 @@ namespace TestProject
     {
 
         [Fact]
+        
         public async Task GetAllDevicesNullToken()
         {
             //arrange
@@ -821,5 +822,5 @@ namespace TestProject
 
 
     }
-}
+}*/
 
