@@ -5,9 +5,7 @@ VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonitorWebAPI", "MonitorWebAPI\MonitorWebAPI.csproj", "{E5A89434-BAE5-4946-8784-3FDEF0ADCD28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject", "TestProject\TestProject.csproj", "{9011CD9A-9833-4B2A-AB6D-0B3C55C4027A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProjectNUnit", "TestProjectNUnit\TestProjectNUnit.csproj", "{7524A62B-924A-44B3-BAB6-33A571059429}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProjectNUnit", "TestProjectNUnit\TestProjectNUnit.csproj", "{7524A62B-924A-44B3-BAB6-33A571059429}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +17,6 @@ Global
 		{E5A89434-BAE5-4946-8784-3FDEF0ADCD28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5A89434-BAE5-4946-8784-3FDEF0ADCD28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5A89434-BAE5-4946-8784-3FDEF0ADCD28}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9011CD9A-9833-4B2A-AB6D-0B3C55C4027A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9011CD9A-9833-4B2A-AB6D-0B3C55C4027A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9011CD9A-9833-4B2A-AB6D-0B3C55C4027A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9011CD9A-9833-4B2A-AB6D-0B3C55C4027A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7524A62B-924A-44B3-BAB6-33A571059429}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7524A62B-924A-44B3-BAB6-33A571059429}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7524A62B-924A-44B3-BAB6-33A571059429}.Release|Any CPU.ActiveCfg = Release|Any CPU
