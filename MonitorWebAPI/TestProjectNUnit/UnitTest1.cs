@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MonitorWebAPI.Controllers;
 using MonitorWebAPI.Models;
@@ -14,6 +14,7 @@ namespace TestProjectNUnit
     {
         private string token;
         private string token2;
+        private string token3;
         [SetUp]
         public void Setup()
         {
@@ -21,7 +22,7 @@ namespace TestProjectNUnit
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
             request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("application/json", "{\r\n    \"email\":\"aayi�@aya.com\",\r\n    \"password\":\"sifraABC\"\r\n}", ParameterType.RequestBody);
+            request.AddParameter("application/json", "{\r\n    \"email\":\"aayić@aya.com\",\r\n    \"password\":\"sifraABC\"\r\n}", ParameterType.RequestBody);
             IRestResponse responseToken = client.Execute(request);
             var s = responseToken.Content.ToString().Split("\":\"");
             var t = s[1].ToString().Split("}");
@@ -37,6 +38,16 @@ namespace TestProjectNUnit
             var t2 = s2[1].ToString().Split("}");
             var v2 = t2[0].ToString().Split('"');
             token2 = "e " + v2[0];
+
+            client.Timeout = -1;
+            var request3 = new RestRequest(Method.POST);
+            request3.AddHeader("Content-Type", "application/json");
+            request3.AddParameter("application/json", "{\r\n    \"email\":\"kdokic1@etf.unsa.ba\",\r\n    \"password\":\"monitor\"\r\n}", ParameterType.RequestBody);
+            IRestResponse responseToken3 = client.Execute(request3);
+            var s3 = responseToken3.Content.ToString().Split("\":\"");
+            var t3 = s3[1].ToString().Split("}");
+            var v3 = t3[0].ToString().Split('"');
+            token3 = "e " + v3[0];
         }
 
         [Test]
@@ -590,6 +601,231 @@ namespace TestProjectNUnit
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             var result = await controller.GetAllCommandLogsForDeviceAndUser(Authorization: token, deviceId: 17, userId: 1254574256);
             Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+        }
+
+                [Test]
+
+        public async Task TestReportsByUserId()
+        {
+            var controller = new ReportController();
+            var result = await controller.ReportsForUserById(Authorization: token3);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestReportsByUserId2()
+        {
+            var controller = new ReportController();
+            var result = await controller.ReportsForUserById(Authorization: token2);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestReportsByUserIdInvalidToken()
+        {
+            var controller = new ReportController();
+            var result = await controller.ReportsForUserById(Authorization: "unauthorized");
+            Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
+        }
+
+        [Test]
+
+        public async Task TestReportsByUserIdNullToken()
+        {
+            var controller = new ReportController();
+            var result = await controller.ReportsForUserById(Authorization: null);
+            Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
+        }
+
+        [Test]
+
+        public async Task TestGetReportsInvalidToken()
+        {
+            var controller = new ReportController();
+            ReportResponseModel reportResponseModel = new ReportResponseModel();
+            var result = await controller.GetReports(Authorization: "unauthorized", reportResponseModel);
+            Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
+        }
+
+        [Test]
+
+        public async Task TestGetReportsNullToken()
+        {
+            var controller = new ReportController();
+            ReportResponseModel reportResponseModel = new ReportResponseModel();
+            var result = await controller.GetReports(Authorization: null, reportResponseModel);
+            Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
+        }
+
+        [Test]
+
+        public async Task TestGetReports()
+        {
+            var controller = new ReportController();
+            ReportResponseModel reportResponseModel = new ReportResponseModel()
+            {
+                Frequency = "Daily",
+                Name = "Report",
+                UserId = 7
+            };
+            var result = await controller.GetReports(Authorization: token3, reportResponseModel);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestGetReports2()
+        {
+            var controller = new ReportController();
+            ReportResponseModel reportResponseModel = new ReportResponseModel()
+            {
+                Frequency = "Daily",
+                Name = "Report",
+                UserId = 7,
+                ReportId= 114,
+                Query = "query",
+
+            };
+            var result = await controller.GetReports(Authorization: token3, reportResponseModel);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestGetReports3()
+        {
+            var controller = new ReportController();
+            ReportResponseModel reportResponseModel = new ReportResponseModel()
+            {
+                Frequency = "Daily",
+                Name = "Report",
+                UserId = 0,
+                ReportId = 0,
+                Query = "query",
+
+            };
+            var result = await controller.GetReports(Authorization: token3, reportResponseModel);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestGetReports4()
+        {
+            var controller = new ReportController();
+            ReportResponseModel reportResponseModel = new ReportResponseModel()
+            {
+                Frequency = "Daily",
+                Name = "Report",
+                Query = "query"
+            };
+            var result = await controller.GetReports(Authorization: token3, reportResponseModel);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestGetReportsByInstanceIdInvalidToken()
+        {
+            var controller = new ReportController();
+            var result = await controller.GetReportsByReportInstanceID(Authorization: "unauthorized", 1);
+            Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
+        }
+
+        [Test]
+
+        public async Task TestGetReportsByInstanceIdNullToken()
+        {
+            var controller = new ReportController();
+            var result = await controller.GetReportsByReportInstanceID(Authorization: null, 1);
+            Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
+        }
+
+        [Test]
+
+        public async Task TestGetReportsByInstanceId()
+        {
+            var controller = new ReportController();
+            var result = await controller.GetReportsByReportInstanceID(Authorization: token3, 1);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestGetReportInstancesdInvalidToken()
+        {
+            var controller = new ReportController();
+            ReportInstanceResponseModel instance = new ReportInstanceResponseModel();
+            var result = await controller.GetReportInstances(Authorization: "unauthorized", instance);
+            Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
+        }
+
+        [Test]
+
+        public async Task TestGetReportInstancesdNullToken()
+        {
+            var controller = new ReportController();
+            ReportInstanceResponseModel instance = new ReportInstanceResponseModel();
+            var result = await controller.GetReportInstances(Authorization: null, instance);
+            Assert.IsInstanceOf<UnauthorizedResult>(result.Result);
+        }
+
+        [Test]
+
+        public async Task TestGetReportInstances()
+        {
+            var controller = new ReportController();
+            ReportInstanceResponseModel instance = new ReportInstanceResponseModel()
+            {
+                UriLink = "https://si2021storage.blob.core.windows.net/si2021pdf/Report-4853571.pdf",
+                ReportId = 114,
+                Name = "RepReport Konzum 2 instanceort",
+                Id = 60
+            };
+            var result = await controller.GetReportInstances(Authorization: token3, instance);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportInstanceResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestGetReportInstances2()
+        {
+            var controller = new ReportController();
+            ReportInstanceResponseModel instance = new ReportInstanceResponseModel()
+            {
+                UriLink = "",
+                ReportId = 0,
+                Name = ""
+            };
+            var result = await controller.GetReportInstances(Authorization: token3, instance);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportInstanceResponseModel>>>(result.Value);
+        }
+
+        [Test]
+
+        public async Task TestGetReportInstances3()
+        {
+            var controller = new ReportController();
+            ReportInstanceResponseModel instance = new ReportInstanceResponseModel()
+            {
+                UriLink = null,
+                ReportId = 0,
+                Name = null
+            };
+            var result = await controller.GetReportInstances(Authorization: token3, instance);
+            Assert.NotNull(result);
+            Assert.IsInstanceOf<ResponseModel<List<ReportInstanceResponseModel>>>(result.Value);
         }
 
 
