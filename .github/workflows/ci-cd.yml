@@ -1,4 +1,4 @@
-name: .NET
+name: Main Server CI-CD
 
 on:
   push:
@@ -19,4 +19,4 @@ jobs:
           key: ${{secrets.SSH_KEY}}
           username: ${{secrets.SSH_USERNAME}}
           
-          script: deployMainServer
+          script: .deployMainServer
