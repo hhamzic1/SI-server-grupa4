@@ -1,4 +1,4 @@
-name: Main Server CI-CD
+name: MainServer CI - CD
 
 on:
   push:
@@ -7,9 +7,30 @@ on:
     branches: [ development ]
 
 jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: MonitorWebAPI
+    - name: Build
+      run: dotnet build --no-restore
+      working-directory: MonitorWebAPI
+    - name: Unit Testing
+      run: dotnet test
+      working-directory: MonitorWebAPI
   
   deploy:
-
+    
+    needs: build
+    
     runs-on: ubuntu-latest
     steps:
       - name: Deploy Main Server
@@ -19,4 +40,4 @@ jobs:
           key: ${{secrets.SSH_KEY}}
           username: ${{secrets.SSH_USERNAME}}
           
-          script: ls
+          script: ./deployMainServerScript.sh
