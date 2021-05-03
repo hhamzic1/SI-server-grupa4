@@ -215,6 +215,7 @@ namespace MonitorWebAPI.Helpers
                 "reporting.monitor@gmail.com",
                 "Test DateTime",
                 m);
+            smptClient.Send(message);
         }
 
         public static void CronJob()
