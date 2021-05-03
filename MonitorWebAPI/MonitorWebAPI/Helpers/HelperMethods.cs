@@ -201,23 +201,6 @@ namespace MonitorWebAPI.Helpers
             return instanceName;
         }
 
-        public static void testEmail(String m)
-        {
-            var smptClient = new SmtpClient("smtp.gmail.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential("reporting.monitor@gmail.com", "monitor2021"),
-                EnableSsl = true
-            };
-
-            MailMessage message = new MailMessage(
-                "reporting.monitor@gmail.com",
-                "reporting.monitor@gmail.com",
-                "Test DateTime",
-                m);
-            smptClient.Send(message);
-        }
-
         public static void CronJob()
         {
             DateTime now = DateTime.Now.AddHours(2);
@@ -237,7 +220,7 @@ namespace MonitorWebAPI.Helpers
                     if (rep.SendEmail.Equals(true) && rep.Deleted.Equals(false))
                     {
                         var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
-                        testEmail("DateTime of report: " + rep.NextDate.ToString() + " CurrentDateTimeServer(+2): " + dateTime + "CompareTo: " + res);
+             
                         linkToAzure = sendEmail(rep.ReportId, email);
                     }
 
