@@ -203,7 +203,7 @@ namespace MonitorWebAPI.Helpers
 
         public static void CronJob()
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.Now.AddHours(2);
             DateTime dateTime = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0);
             monitorContext mc = new monitorContext();
             List<Report> reports = mc.Reports.ToList();
@@ -217,10 +217,10 @@ namespace MonitorWebAPI.Helpers
                 {
                     string linkToAzure = "";
 
-                    if (rep.SendEmail.Equals(true))
+                    if (rep.SendEmail.Equals(true) && rep.Deleted.Equals(false))
                     {
                         var email = mc.Users.Where(x => x.UserId == rep.UserId).FirstOrDefault().Email;
-
+                        Console.WriteLine("DateTime of report: " + rep.NextDate.ToString() + " CurrentDateTimeServer(+2): " + dateTime + "CompareTo: " + res);
                         linkToAzure = sendEmail(rep.ReportId, email);
                     }
 
