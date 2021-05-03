@@ -31,8 +31,9 @@ namespace MonitorWebAPI.Helpers
             Report report = mc.Reports
                 .Where(r => r.ReportId == reportId)
                 .FirstOrDefault();
-
-            string documentPath = "/root/SI-server-grupa4/MonitorWebAPI/MonitorWebAPI/data/" + instanceName;
+            
+            System.IO.Directory.CreateDirectory("/home/apps/monitor-app/data/");
+            string documentPath = "./data/" + instanceName;
             DocumentCore dc = new DocumentCore();
             Section s = new Section(dc);
             dc.Sections.Add(s);
