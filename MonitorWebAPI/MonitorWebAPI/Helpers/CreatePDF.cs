@@ -32,7 +32,7 @@ namespace MonitorWebAPI.Helpers
                 .Where(r => r.ReportId == reportId)
                 .FirstOrDefault();
 
-            string documentPath = Directory.GetCurrentDirectory() + "/data/" + instanceName;
+            string documentPath = "./data/" + instanceName;
             DocumentCore dc = new DocumentCore();
             Section s = new Section(dc);
             dc.Sections.Add(s);
