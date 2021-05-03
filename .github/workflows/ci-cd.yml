@@ -25,3 +25,4 @@ jobs:
       working-directory: MonitorWebAPI
     - name: Unit Testing
       run: dotnet test
+      working-directory: MonitorWebAPI
