@@ -3,8 +3,6 @@ name: MainServer CI - CD
 on:
   push:
     branches: [ development ]
-  pull_request:
-    branches: [ development ]
 
 jobs:
   build:
