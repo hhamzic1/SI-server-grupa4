@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MonitorWebAPI.Helpers.Query
 {
-    interface QueryItem
+    public interface QueryItem
     {
         bool IsGroup();
         bool IsRule();

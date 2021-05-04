@@ -11,7 +11,7 @@ namespace MonitorWebAPI.Helpers
 {
     public class GroupModel : QueryItem
     {
-        List<QueryItem> rule_items { get; set; } = null;
+        public List<QueryItem> rule_items { get; set; } = null;
         public List<object> rules { get; set; } = null;
         public string combinator { get; set; } = "AND";
         public bool not { get; set; } = false;
