@@ -177,7 +177,7 @@ namespace TestProjectNUnit
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             Guid uid = new Guid("eba54ce1-1df9-49ca-b104-801a8827f911");
             var response = controller.ControllerContext.HttpContext.Response;
-            var result = await controller.CheckIfDeviceBelongsToUser(Authorization: token, uid);
+            var result = await controller.CheckIfDeviceBelongsToUser(Authorization: token, uid, null);
             Assert.NotNull(result);
             Assert.AreEqual(200, response.StatusCode);
         }
@@ -189,7 +189,7 @@ namespace TestProjectNUnit
 
             var controller = new DeviceController();
             Guid uid = new Guid();
-            var result = await controller.CheckIfDeviceBelongsToUser(Authorization: null, uid);
+            var result = await controller.CheckIfDeviceBelongsToUser(Authorization: null, uid, null);
             Assert.IsInstanceOf<UnauthorizedResult>(result);
         }
 
