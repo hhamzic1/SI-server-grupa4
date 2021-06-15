@@ -387,6 +387,19 @@ namespace MonitorWebAPI.Controllers
             }
         }
 
+        [Route("api/device/doesDeviceExist/{deviceUid}")]
+        public ActionResult DoesDeviceExist(Guid deviceUid)
+        {
+            Device device = mc.Devices.Where(x => x.DeviceUid == deviceUid).FirstOrDefault();
+            if (device == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok();
+            }
+        }
 
 
         [Route("api/device/GetAverageHardwareUsageForUser")]
