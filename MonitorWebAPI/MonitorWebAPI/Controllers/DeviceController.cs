@@ -23,6 +23,7 @@ namespace MonitorWebAPI.Controllers
         private readonly string SUPER_ADMIN = "SuperAdmin";
         private readonly string MONITOR_SUPER_ADMIN = "MonitorSuperAdmin";
         private HelperMethods helperMethod;
+        private readonly string ADMIN_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJhYXlpxIdAYXlhLmNvbSIsInJvbGVJZCI6MiwiZ3JvdXBJZCI6bnVsbCwiaWF0IjoxNjE3NDUzMjY2LCJleHAiOjE2MjE3NzMyNjZ9.0fvl4a_MUPOLSspNculgXvnq7ZoddKAcP6mkc6kf5Eo";
         public DeviceController()
         {
             mc = new monitorContext();
@@ -347,8 +348,20 @@ namespace MonitorWebAPI.Controllers
 
         [Route("api/device/CheckIfDeviceBelongsToUser/{deviceUid}")]
         [HttpGet]
-        public async Task<ActionResult> CheckIfDeviceBelongsToUser([FromHeader] string Authorization, Guid deviceUid)
+        public async Task<ActionResult> CheckIfDeviceBelongsToUser([FromHeader] string Authorization, Guid deviceUid, [FromQuery] String isAdmin)
         {
+            if(isAdmin == ADMIN_ACCESS_TOKEN)
+            {
+                Device device = mc.Devices.Where(x => x.DeviceUid == deviceUid).FirstOrDefault();
+                if (device == null)
+                {
+                    return StatusCode(200);
+                }
+                else
+                {
+                    return StatusCode(200);
+                }
+            }
             string JWT = JWTVerify.GetToken(Authorization);
             if (JWT == null)
             {
@@ -384,20 +397,6 @@ namespace MonitorWebAPI.Controllers
             else
             {
                 return Unauthorized();
-            }
-        }
-
-        [Route("api/device/doesDeviceExist/{deviceUid}")]
-        public ActionResult DoesDeviceExist(Guid deviceUid)
-        {
-            Device device = mc.Devices.Where(x => x.DeviceUid == deviceUid).FirstOrDefault();
-            if (device == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return Ok();
             }
         }
 
